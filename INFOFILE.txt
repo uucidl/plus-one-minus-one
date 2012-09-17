@@ -1,0 +1,84 @@
+      .
+      :
+      | +1  pas en 
+      | un        ar       -1
+     .|    he.ine   rière -    or,
+     :|   t      qua       erat
+     |:   [pas en2002
+     |'      .03.le lity.op
+     :
+     '
+  http://neq.tpolm.com
+
+instr::
+  may wish to try/ 
+    $ ./+1-1 nonet 
+  /if network impaired.
+    $ ./+1-1 audiodevice=/dev/dsp1
+  /if needed.
+
+  may wish to try also/
+    $ ./+1-1 module=file:///demos/2001/b10/b10.xm
+  /if zden
+    press keys, move your hand . fingers
+  /if clued
+
+  may wish to learn how to use/
+    $ ./+1-1 freeze
+    $ mkdir set1
+    $ mv *.jpg set1
+    $ ./+1-1 restore=set1/ # final '/' is mandatory
+  /if wishes to freeze then restore downloaded resources
+
+crdts::
+  arthur rimbaud
+  freetype
+  gcc
+  make
+  modplug
+  ccg
+  libffi
+  libpng
+  libjpg
+  log4c
+  pthread
+  tinyptc|SDL|portaudio
+  urarlib
+
+grtgs::
+  a.j
+  a.j
+  a.d
+  e.r
+  f.c
+  g.d
+  j.r
+  j.m
+  j.l
+  l.n
+  m.l
+  m.m
+  m.u
+  n.n
+  n.b
+  n.l
+  r.d
+  t.l
+  u.h
+  x.p
+  z.h
+  ...
+
+
+     .
+     :
+     |.
+     |:
+     :|
+     '|
+      |
+      |
+      :
+      .
+
+
