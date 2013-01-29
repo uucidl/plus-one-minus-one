@@ -15,7 +15,12 @@
 #define KNOS_MESSAGING_LIBFFI_DEFINITIONS_H
 
 #include <messaging/definitions.h>
-#include <ffi/ffi.h>
+#if defined (LINUX)
+  #include <ffi.h>
+#else
+  #include <ffi/ffi.h>
+#endif
+
 
 typedef struct ffi_desc_t
 {

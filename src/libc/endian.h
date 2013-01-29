@@ -29,7 +29,11 @@
 
 
 #if defined (LINUX)
-  #include <endian.h>
+  #if defined (FREEBSD)
+    #include <sys/endian.h>
+  #else
+    #include <endian.h>
+  #endif
 
 #ifndef LITTLE_ENDIAN
 #  define LITTLE_ENDIAN	__LITTLE_ENDIAN

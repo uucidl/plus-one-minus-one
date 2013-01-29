@@ -21,7 +21,9 @@
 #include <system/pan.h>
 
 #if defined(__i386__)
+/* XXX: _8pu_specialize is missing
 #define USE_CG 1
+*/
 #endif
 
 static

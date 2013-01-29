@@ -47,7 +47,7 @@ void a_free(void* ptr) {
     _aligned_free(ptr);
 }
 
-#elif defined(LINUX)
+#elif defined(LINUX) && !defined(FREEBSD)
 
 #include <malloc.h>
 #include <string.h> // for memset

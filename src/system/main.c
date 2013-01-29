@@ -14,10 +14,9 @@
 
 #include "main.h"
 
-#if defined(LINUX)
-extern int linux_main_loop(demo_t* demo);
-#define os_main_loop linux_main_loop
-#elif defined(MACOSX)
+#if defined(LINUX) || defined(MACOSX)
+/* NOTE: no OS X specific stuff in macosx_main_loop,
+ * linux_main_loop does not exist */
 extern int macosx_main_loop(demo_t* demo);
 #define os_main_loop macosx_main_loop
 #elif defined(WIN32)

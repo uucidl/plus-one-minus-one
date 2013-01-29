@@ -24,7 +24,9 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_VLOGIC);
 #include <libc/stdint.h>
 
 #if defined(__i386__)
+/* XXX: _8pu_specialize_block is missing
 #define USE_CG 1
+*/
 #endif
 
 static

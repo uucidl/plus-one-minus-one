@@ -1,14 +1,47 @@
-local CFiles = { ".c", ".h", ".cc", ".m" }
+local CFiles = { ".c", ".h", ".cc" }
+local ObjCFiles = { ".m" }
+local linux_common = {
+	Tools = { "gcc" },
+	Env = {
+		CCOPTS = {
+			"`pkg-config --cflags libffi`",
+
+		},
+		CPPDEFS = {
+			"LINUX",
+			"K8",
+		},
+		PROGOPTS= {
+			"`pkg-config --libs gl`",
+		}
+	},
+	ReplaceEnv = {
+		LD = "$(CXX)"
+	}
+}
+
 Build {
 	Configs = {
 		Config {
-			Name = "generic-gcc",
+			Name = "linux-gcc",
 			DefaultOnHost = "linux",
-			Tools = { "gcc" },
-			Defines = { "LINUX", "K8" },
-			ReplaceEnv = {
-				LD = "$(CXX)"
-			}
+			Inherit = linux_common,
+		},
+		Config {
+			Name = "freebsd-gcc",
+			DefaultOnHost = "freebsd",
+			Inherit = linux_common,
+			Env = {
+				CCOPTS = {
+					"`pkg-config --cflags portaudio-2.0`",
+				},
+				PROGOPTS = {
+					"`pkg-config --libs portaudio-2.0`",
+				},
+				CPPDEFS = {
+					"FREEBSD"
+				},
+			},
 		},
 		Config {
 			Name = "macosx-gcc",
@@ -35,7 +68,13 @@ Build {
 		require "tundra.syntax.glob"
 		Program {
 			Name = "a.out",
-			Sources = { Glob { Dir = ".", Extensions = CFiles } },
+			Sources = {
+				Glob { Dir = ".", Extensions = CFiles },
+				{
+					Glob { Dir = ".", Extensions = ObjCFiles } ;
+					Config = "macosx-gcc"
+				}
+			},
 			Includes = { 
 				"src",
 				"src/third-party/log4c"

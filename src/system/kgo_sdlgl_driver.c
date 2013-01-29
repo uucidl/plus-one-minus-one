@@ -80,7 +80,9 @@ void setupWIN32 (kgo_sdlgl_driver_t* self)
 #elif defined(LINUX)
 
 #include <SDL_syswm.h>
+/* XXX: x11/xdnd.h does not exist
 #include <system/architectures/x11/xdnd.h>
+*/
 
 static
 void setupLINUX (kgo_sdlgl_driver_t* self)
@@ -96,7 +98,9 @@ void setupLINUX (kgo_sdlgl_driver_t* self)
     }
 
     info.info.x11.lock_func();
+    /* XXX
     xdnd_init (info.info.x11.display, info.info.x11.wmwindow);
+    */
     self->x11_display = info.info.x11.display;
     self->x11_window  = info.info.x11.window;
     info.info.x11.unlock_func();

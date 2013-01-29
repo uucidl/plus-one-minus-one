@@ -116,7 +116,9 @@ mouse_event_t* mouse_event_fromSDL_MouseMotionEvent(mouse_event_t* x,
   #include <SDL_syswm.h>
 #elif defined(LINUX)
   #include <SDL_syswm.h>
-  #include <system/architectures/x11/xdnd.h>
+/* XXX: x11/xdnd.h does not exist
+ #include <system/architectures/x11/xdnd.h>
+*/
 #endif
 
 static
@@ -169,9 +171,11 @@ void event_listener_accept(sdl_event_listener_t* self, const SDL_Event* event)
 /* drag and drop for LINUX */
     } else if(event->type == SDL_SYSWMEVENT) {
       SDL_SysWMmsg* msg = event->syswm.msg;
+      /* XXX
       if(xdnd_is_dnd_event(&msg->event.xevent)) {
 	  xdnd_process_event(&msg->event.xevent, &self->super);
     }
+    */
 #endif
     }
 
