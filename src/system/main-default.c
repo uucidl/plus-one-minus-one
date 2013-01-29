@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/system/main-macosx.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
@@ -41,7 +41,7 @@ void ptc_cleanup_callback(void)
     DEBUG2("total time: %f\n", demo->current_ms);
 
     free(videobuffer);
-    
+
     demo->kgo_effect_root->destroy (demo->kgo_effect_root);
     demo->pan_effect_root->destroy (demo->pan_effect_root);
 
@@ -49,7 +49,7 @@ void ptc_cleanup_callback(void)
     pan_close();
 }
 
-int macosx_main_loop(demo_t* d)
+int default_main_loop(demo_t* d)
 {
     effect_t* video_fx;
 
@@ -71,8 +71,8 @@ int macosx_main_loop(demo_t* d)
     }
 
     if(!kgo_open(KGO_DEFAULT, demo->title, demo->video_width, demo->video_height)) {
-      ERROR1("video: cannot open.");	
-      
+      ERROR1("video: cannot open.");
+
       return 1;
     }
 
@@ -81,7 +81,7 @@ int macosx_main_loop(demo_t* d)
 	return 1;
     }
 
-    videobuffer =       
+    videobuffer =
 	kgo_allocate_frame();
 
     video_fx = demo->kgo_effect_root;
@@ -95,7 +95,7 @@ int macosx_main_loop(demo_t* d)
 	}
 	demo->set_midi_event_listener (demo, midi_get_event_listener ());
     }
-    
+
     pan_start();
     while (demo->running_p)
     {
@@ -104,7 +104,7 @@ int macosx_main_loop(demo_t* d)
       demo->video_frame_ms /= 2;
 
       demo->tick (demo, ms);
-      
+
       video_fx->computes(video_fx, videobuffer, demo->current_ms);
 
       kgo_update (videobuffer, 1);
@@ -115,23 +115,7 @@ int macosx_main_loop(demo_t* d)
     }
 
     pan_close();
-    kgo_close();    
-    
+    kgo_close();
+
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
