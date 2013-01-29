@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/vlogic.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
@@ -22,10 +22,6 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_VLOGIC);
 #include <libc/stdio.h>
 #include <libc/math.h>
 #include <libc/stdint.h>
-
-#if defined(__i386__)
-#define USE_CG 1
-#endif
 
 static
 int vlogic_new(effect_t* self)

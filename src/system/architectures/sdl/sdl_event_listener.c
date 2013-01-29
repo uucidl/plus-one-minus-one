@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/system/architectures/sdl/sdl_event_listener.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
@@ -116,7 +116,6 @@ mouse_event_t* mouse_event_fromSDL_MouseMotionEvent(mouse_event_t* x,
   #include <SDL_syswm.h>
 #elif defined(LINUX)
   #include <SDL_syswm.h>
-  #include <system/architectures/x11/xdnd.h>
 #endif
 
 static
@@ -165,13 +164,6 @@ void event_listener_accept(sdl_event_listener_t* self, const SDL_Event* event)
 	}
 	event_retire (&drop_event);
       }
-#elif defined(LINUX)
-/* drag and drop for LINUX */
-    } else if(event->type == SDL_SYSWMEVENT) {
-      SDL_SysWMmsg* msg = event->syswm.msg;
-      if(xdnd_is_dnd_event(&msg->event.xevent)) {
-	  xdnd_process_event(&msg->event.xevent, &self->super);
-    }
 #endif
     }
 
