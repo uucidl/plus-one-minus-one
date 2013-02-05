@@ -53,16 +53,15 @@ double get_unix_milliseconds()
 
 #elif defined(LINUX) || defined(MACOSX)
 
-#include <libc/sys/time.h>
-#include <libc/stdlib.h>
+#include <time.h>
 
 double get_milliseconds()
 {
-    struct timeval tv;
+    struct timespec tp;
     double t;
     
-    gettimeofday(&tv, NULL);
-    t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
+    clock_gettime(CLOCK_MONOTONIC, &tp);
+    t = (1000.0 * tp.tv_sec) + (tp.tv_nsec / 1000000.0);
     
     return t;
 }

@@ -52,7 +52,11 @@ int pan_portaudio_callback(const void* inputBuffer,
 			   void* userData)
 {
     pan_portaudio_driver_t* self = (pan_portaudio_driver_t*) userData;
+#ifdef PA_TIMING_FIX
+    double t = get_milliseconds();
+#else
     double t = 1000.0 * timeInfo->outputBufferDacTime;
+#endif
 
     if(self->started_p) {
 	// do the thang.
@@ -166,8 +170,12 @@ int pan_portaudio_configure_demo (pan_driver_t* zelf, demo_t* demo)
 static
 PaTime streamtime(pan_portaudio_driver_t* self)
 {
+#ifdef PA_TIMING_FIX
+    return get_milliseconds() / 1000.00;
+#else
     PaTime time = Pa_GetStreamTime(self->stream); //self->frame_number * self->buffer_number;
     return time < 0.0 ? 0.0 : time;
+#endif
 }
 
 static

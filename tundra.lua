@@ -10,6 +10,7 @@ local linux_common = {
 		CPPDEFS = {
 			"LINUX",
 			"K8",
+			"PA_TIMING_FIX"
 		},
 		PROGOPTS= {
 			"`pkg-config --libs gl`",
