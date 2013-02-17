@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/library/time.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
@@ -10,10 +10,7 @@
  * e 554 */
 
 
-
-
 #include <library/time.h>
-
 
 #if defined(WIN32)
 
@@ -26,7 +23,7 @@ double get_milliseconds()
 {
   double t;
   static LARGE_INTEGER now;
-    
+
   if(!freq_p) {
       QueryPerformanceFrequency(&freq);
       freq_p = 1;
@@ -47,48 +44,78 @@ double get_unix_milliseconds()
 {
   struct _timeb now;
   _ftime(&now);
-  
+
   return 1000.0*now.time + now.millitm;
 }
 
-#elif defined(LINUX) || defined(MACOSX)
+#elif defined(LINUX)
 
-#include <libc/sys/time.h>
-#include <libc/stdlib.h>
+#include <time.h>
 
-double get_milliseconds()
+extern double get_milliseconds()
 {
-    struct timeval tv;
+    struct timespec tp;
     double t;
-    
-    gettimeofday(&tv, NULL);
-    t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
-    
+
+    clock_gettime(CLOCK_MONOTONIC, &tp);
+    t = (1000.0 * tp.tv_sec) + (tp.tv_nsec / 1000000.0);
+
     return t;
 }
 
-double get_unix_milliseconds()
+extern double get_unix_milliseconds()
 {
-  return get_milliseconds();
+	struct timeval tv;
+	double t;
+
+	gettimeofday(&tv, NULL);
+	t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
+
+	return t;
 }
 
-#elif defined(PS2) && defined(EE)
+#elif defined(MACOSX)
 
-#include <tpolm/lsv700609/cpu.h>
+#include <mach/mach_time.h>
+#include <sys/time.h>
+#include <log4c.h>
 
-/*
-  does not work!
-*/
-double get_unix_milliseconds()
+LOG_NEW_DEFAULT_CATEGORY(CLOCK);
+
+static struct mach_timebase_info timebase_info;
+
+static void clock_init() __attribute__((constructor));
+
+static void clock_init()
 {
-	return get_milliseconds ();
+	mach_timebase_info_data_t info;
+	if (mach_timebase_info (&info))
+	{
+		ERROR1("Could not initialize clock");
+		return;
+	}
+
+	timebase_info = info;
 }
 
-// beware, it can wrap around!
-double get_milliseconds()
+extern double get_milliseconds()
 {
-	const long c = get_cycle_counter ();
-	return (float) c * 1000.f / 300e6f;
+	double micros = mach_absolute_time() *
+		timebase_info.numer /
+		timebase_info.denom / 1000;
+
+	return micros / 1000.0;
+}
+
+extern double get_unix_milliseconds()
+{
+	struct timeval tv;
+	double t;
+
+	gettimeofday(&tv, NULL);
+	t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
+
+	return t;
 }
 
 #else

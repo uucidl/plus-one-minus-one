@@ -2,7 +2,7 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/system/pan_portaudio_driver.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
@@ -34,6 +34,7 @@ typedef struct pan_portaudio_driver_t
     volatile int started_p;
     volatile int started_yeah_p;
     PaStream* stream;
+    PaStreamInfo const* stream_info;
     audio_effect_t* ae;
 
     PaDeviceIndex device_id;
@@ -52,7 +53,11 @@ int pan_portaudio_callback(const void* inputBuffer,
 			   void* userData)
 {
     pan_portaudio_driver_t* self = (pan_portaudio_driver_t*) userData;
+#ifdef PA_TIMING_FIX
+    double t = get_milliseconds();
+#else
     double t = 1000.0 * timeInfo->outputBufferDacTime;
+#endif
 
     if(self->started_p) {
 	// do the thang.
@@ -156,6 +161,8 @@ int pan_portaudio_configure_demo (pan_driver_t* zelf, demo_t* demo)
     if(error != paNoError)
 	return 0;
 
+    self->stream_info = Pa_GetStreamInfo(self->stream);
+
     Pa_StartStream (self->stream);
 
     self->running_p = 1;
@@ -166,8 +173,17 @@ int pan_portaudio_configure_demo (pan_driver_t* zelf, demo_t* demo)
 static
 PaTime streamtime(pan_portaudio_driver_t* self)
 {
+#ifdef PA_TIMING_FIX
+    double latency_in_s = 0.0;
+    if (self->stream_info) {
+	    latency_in_s = self->stream_info->outputLatency;
+    }
+
+    return get_milliseconds() / 1000.00 + latency_in_s;
+#else
     PaTime time = Pa_GetStreamTime(self->stream); //self->frame_number * self->buffer_number;
     return time < 0.0 ? 0.0 : time;
+#endif
 }
 
 static
@@ -250,6 +266,8 @@ int pan_portaudio_destroy(pan_driver_t* zelf)
 	Pa_CloseStream (self->stream);
 	Pa_Terminate();
 	self->running_p = 0;
+	self->stream = NULL;
+	self->stream_info = NULL;
     }
 
     return 1;
