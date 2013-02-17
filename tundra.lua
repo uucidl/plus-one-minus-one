@@ -48,10 +48,10 @@ Build {
 			Name = "macosx-gcc",
 			DefaultOnHost = "macosx",
 			Tools = { "clang-osx" },
-			Env = { 
-				CPPDEFS = { 
-					"MACOSX", 
-					"K8" 
+			Env = {
+				CPPDEFS = {
+					"MACOSX",
+					"K8"
 				},
 			},
 			ReplaceEnv = {
@@ -76,13 +76,13 @@ Build {
 					Config = "macosx-gcc"
 				}
 			},
-			Includes = { 
+			Includes = {
 				"src",
 				"src/third-party/log4c"
 			},
-			Defines = { 
+			Defines = {
 				'MAP_STL_IMPL',
-				'CSTR_MAP_STL_IMPL', 
+				'CSTR_MAP_STL_IMPL',
 				'KGO_DEFAULT=\\"sdlgl\\"',
 				'PAN_DEFAULT=\\"portaudio\\"',
 				'KNOS_RELEASE=-1',
@@ -104,7 +104,8 @@ Build {
 					"`sdl-config --cflags`",
 					"`freetype-config --cflags`",
 					{ "-Os" ; Config = "*-gcc-release-*" },
-					{ "-Os" ; Config = "*-clang-release-*" }
+					{ "-Os" ; Config = "*-clang-release-*" },
+					{ "-O0 -g" ; Config = "*-*-debug-*" },
 				},
 				PROGOPTS = {
 					"`sdl-config --libs`",
