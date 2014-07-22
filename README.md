@@ -4,7 +4,8 @@ plus one minus one
 +1-1 by != ; an experimental demo released at Mekka Symposium 2002
 
 ![screenshot](http://img.youtube.com/vi/FaUoeXsHOFA/hqdefault.jpg)
-![video on youtube](https://www.youtube.com/watch?v=FaUoeXsHOFA)
+
+[video on youtube](https://www.youtube.com/watch?v=FaUoeXsHOFA)
 
 ## How Am I Building This Thing?
 
