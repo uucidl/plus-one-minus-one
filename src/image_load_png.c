@@ -18,6 +18,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_LOAD_PNG);
 #include "image_load_png.h"
 #include <png.h>
 #include <libc/stdlib.h>
+#include <libc/string.h>
 #include <libc/endian.h>
 
 static
