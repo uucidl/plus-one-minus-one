@@ -1284,8 +1284,8 @@ int main(int argc, char** argv)
 
     demo = demo_get_instance ();
     demo->title             = "+1-1";
-    demo->video_width       = 640;
-    demo->video_height      = 480;
+    demo->video_width       = 800;
+    demo->video_height      = 600;
     demo->video_buffers     = 6;
     demo->video_frame_ms    = 20.0;
     demo->audio_sample_rate = 44100;
