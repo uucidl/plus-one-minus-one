@@ -26,3 +26,9 @@ Then get any missing required library.
 Then type tundra or tundra2 at the top level, and run the program in
 the tundra-output/t2-output directory. It should pick up the data
 files found in dat/
+
+### Notes
+
+This demo was unique in its time for its use of the network to fetch
+images for instance using google images. This however is not working
+anymore as what the service returns has significantly changed.
