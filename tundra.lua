@@ -10,7 +10,6 @@ local linux_common = {
                 CPPDEFS = {
                         "LINUX",
                         "K8",
-                        "PA_TIMING_FIX"
                 },
                 PROGOPTS= {
                         "`pkg-config --libs gl`",
@@ -33,12 +32,6 @@ Build {
                         DefaultOnHost = "freebsd",
                         Inherit = linux_common,
                         Env = {
-                                CCOPTS = {
-                                        "`pkg-config --cflags portaudio-2.0`",
-                                },
-                                PROGOPTS = {
-                                        "`pkg-config --libs portaudio-2.0`",
-                                },
                                 CPPDEFS = {
                                         "FREEBSD"
                                 },
@@ -84,7 +77,7 @@ Build {
                                 'MAP_STL_IMPL',
                                 'CSTR_MAP_STL_IMPL',
                                 'KGO_DEFAULT=\\"sdlgl\\"',
-                                'PAN_DEFAULT=\\"portaudio\\"',
+                                'PAN_DEFAULT=\\"sdl\\"',
                                 'KNOS_RELEASE=-1',
                                 'KNOS_BUILD=0',
                                 'MMCMP_SUPPORT',
@@ -92,7 +85,6 @@ Build {
                         },
                         Libs = {
                                 "ffi",
-                                "portaudio",
                                 "jpeg",
                                 "png"
                         },

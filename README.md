@@ -1,6 +1,6 @@
 plus one minus one
 ==================
- 
+
 +1-1 by != ; an experimental demo released at Mekka Symposium 2002
 
 ![screenshot](http://img.youtube.com/vi/FaUoeXsHOFA/hqdefault.jpg)
@@ -16,8 +16,7 @@ plus one minus one
 - libffi
 - zlib
 - freetype
-- Portaudio
-  
+
 ### Instructions
 
 First get [Tundra](https://github.com/deplinenoise/tundra)
