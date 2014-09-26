@@ -4,6 +4,7 @@ local linux_common = {
         Tools = { "gcc" },
         Env = {
                 CCOPTS = {
+                        "-std=gnu99",
                         "`pkg-config --cflags libffi`",
 
                 },
@@ -13,6 +14,7 @@ local linux_common = {
                 },
                 PROGOPTS= {
                         "`pkg-config --libs gl`",
+			"-lpthread",
                 }
         },
         ReplaceEnv = {
