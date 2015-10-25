@@ -99,7 +99,7 @@ void text_display_computes(effect_t* e, void* content, double ms)
 		{
 		    int x = self->ft.pen_x;
 		    self->ft.draw_string(&self->ft, &dest, word);
-		    self->ft.pen_x = x + 3;
+		    self->ft.pen_x = x + self->ghost_offset;
 		    self->ft.draw_string(&self->ft, &dest, word);
 		    self->ft.pen_x += self->ft.font_height/3;
 		}
@@ -116,6 +116,22 @@ void text_display_computes(effect_t* e, void* content, double ms)
     }
 }
 
+void text_display_set_frame_size(video_effect_t* self, int width, int height, int pitch) {
+    text_display_t* t  = (text_display_t*) self;
+
+    t->super.width  = width;
+    t->super.height = height;
+    t->super.pitch  = pitch;
+
+    double scale = height / 240.0;
+    int font_height = 24 * scale;
+
+    t->font_height = font_height;
+    t->x = font_height;
+    t->y = font_height;
+    t->ghost_offset = 3 * scale;
+}
+
 text_display_t* text_display_instantiate(text_display_t* x)
 {
     text_display_t* t = text_display_instantiate_super (x);
@@ -123,11 +139,8 @@ text_display_t* text_display_instantiate(text_display_t* x)
     ft_renderer_instantiate_toplevel (&t->ft);
     t->ft.new (&t->ft);
 
-    t->font_height = 24;
-    t->x = 48;
-    t->y = 48;
-
     t->super.super.computes = text_display_computes;
+    t->super.set_frame_size = text_display_set_frame_size;
     t->set_text = text_display_set_text;
     t->next_line = text_display_next_line;
 
