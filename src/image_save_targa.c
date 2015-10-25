@@ -34,6 +34,7 @@ static inline void write_le16(int8_t *destination, int16_t i)
 #endif
 }
 
+#if defined(P1M1_UNUSED)
 static inline void write_le32(int8_t *destination, int32_t i)
 {
 #if BYTE_ORDER == LITTLE_ENDIAN
@@ -46,6 +47,7 @@ static inline void write_le32(int8_t *destination, int32_t i)
 #warning "weird byte order."
 #endif
 }
+#endif
 
 void image_save_targa(image_t *image, FILE *fd)
 {
