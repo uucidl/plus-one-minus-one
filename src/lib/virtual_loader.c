@@ -10,13 +10,13 @@
  * full acceptance and understanding.
  * e 291 */
 
-#include "virtual_loader.h"
 #include "resource_loaders.h"
+#include "virtual_loader.h"
 #include <lib/url.h>
 #include <lib/url_open.h>
 
-#include <library/map_impl.h>
 #include <library/cstr_map_impl.h>
+#include <library/map_impl.h>
 
 #include <libc/string.h>
 
@@ -181,6 +181,7 @@ static stream_t *virtual_url_open(const char *url, const char *mode)
                 if (strmmmmmmmeeeee)
                     break;
             }
+            local_path_iterator_retire(it);
         } else {
             url_t *lu = v->get_local_url(v, vhost);
             if (lu) {
