@@ -14,7 +14,7 @@ local linux_common = {
                 },
                 PROGOPTS= {
                         "`pkg-config --libs gl`",
-			"-lpthread",
+                        "-lpthread",
                 }
         },
         ReplaceEnv = {
@@ -94,11 +94,12 @@ Build {
                                 "OpenGL"
                         },
                         Env = {
-                                CCOPTS = {
+                           CCOPTS = {
+                                        "-Wall -Werror -Wno-unused-function",
                                         "`sdl-config --cflags`",
                                         "`freetype-config --cflags`",
-                                        { "-Os" ; Config = "*-gcc-release-*" },
-                                        { "-Os" ; Config = "*-clang-release-*" },
+                                        { "-O2" ; Config = "*-gcc-release-*" },
+                                        { "-O2" ; Config = "*-clang-release-*" },
                                         { "-O0 -g" ; Config = "*-*-debug-*" },
                                 },
                                 PROGOPTS = {
