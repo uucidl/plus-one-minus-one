@@ -39,38 +39,38 @@ static char *font_url = "virtual://resources/dat/RopaSans-Regular.otf";
     // network enabled by default
     static int network_p = 1;
 
+#include <lib/chance.h>
 #include <system/demo.h>
 #include <system/effect.h>
-#include <system/main.h>
 #include <system/effects.h>
-#include <lib/chance.h>
+#include <system/main.h>
 
 #include <lib/pixel.h>
 #include <lib/url_open.h>
+#include <libc/math.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
-#include <libc/math.h>
 
 #include <modplug/modplug_player.h>
 
 #include <messaging/receiver.h>
-#include <scripting/dictionary.h>
 #include <scripting/compile.h>
+#include <scripting/dictionary.h>
 
 #include "alogic.h"
-#include "projector.h"
-#include "image.h"
+#include "blur.h"
+#include "gscreen.h"
 #include "icefx.h"
+#include "image.h"
+#include "metro.h"
+#include "projector.h"
+#include "rub.h"
 #include "stutter.h"
 #include "tap.h"
-#include "vlogic.h"
-#include "metro.h"
-#include "blur.h"
-#include "rub.h"
-#include "vmix.h"
-#include "gscreen.h"
-#include "vloo.h"
 #include "text-display.h"
+#include "vlogic.h"
+#include "vloo.h"
+#include "vmix.h"
 
 effect_t *vlogic;
 effect_t *tv;
@@ -219,8 +219,8 @@ typedef struct stutter_control_t {
     event_listener_t super;
 
     int pressed_p;
-    enum { SC_YNONE, SC_HIGH_BASE, SC_LOW_BASE, SC_FB } controlled_variableX;
-    enum { SC_XNONE, SC_REPEAT_PROBA, SC_SPEED } controlled_variableY;
+    enum { SC_XNONE, SC_REPEAT_PROBA, SC_SPEED } controlled_variableX;
+    enum { SC_YNONE, SC_HIGH_BASE, SC_LOW_BASE, SC_FB } controlled_variableY;
 
     int acquire_origin_p;
     int x0, y0;
