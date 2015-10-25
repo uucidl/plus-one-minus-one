@@ -2,14 +2,12 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/lib/fpu.h') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 425 */
-
-
 
 #ifndef KNOS_DEMOS_LIB_FPU_H
 #define KNOS_DEMOS_LIB_FPU_H
@@ -23,50 +21,51 @@
 #define double_to_int(f) ((int)(f))
 #define float_to_int(f) ((int)(f))
 
-#else 
+#else
 
 /*
   very crude x86 float to int conversions
-  assumes the FPU is in round mode! 
+  assumes the FPU is in round mode!
 
   comes from libvorbis code.
 */
 
-static inline 
-int16_t fpu_setround (){
+static inline int16_t fpu_setround()
+{
     int16_t ret;
     int16_t temp;
     __asm__ __volatile__("fnstcw %0\n\t"
-			 "movw %0,%%dx\n\t"
-			 "orw $62463,%%dx\n\t"
-			 "movw %%dx,%1\n\t"
-			 "fldcw %1\n\t":"=m"(ret):"m"(temp): "dx");
+                         "movw %0,%%dx\n\t"
+                         "orw $62463,%%dx\n\t"
+                         "movw %%dx,%1\n\t"
+                         "fldcw %1\n\t"
+                         : "=m"(ret)
+                         : "m"(temp)
+                         : "dx");
     return ret;
 }
 
-static inline 
-void fpu_restore(int16_t fpu){
-  __asm__ __volatile__("fldcw %0": : "m"(fpu));
-}
-
-static inline 
-int32_t double_to_int(double f) {
-/* yes, double!  Otherwise,
-   we get extra fst/fld to
-   truncate precision */
-  int32_t i;
-  __asm__("fistl %0": "=m"(i) : "t"(f));
-  return(i);
-}
-
-static inline 
-int32_t float_to_int(float val)
+static inline void fpu_restore(int16_t fpu)
 {
-    return double_to_int ((double) val);
+    __asm__ __volatile__("fldcw %0" : : "m"(fpu));
+}
+
+static inline int32_t double_to_int(double f)
+{
+    /* yes, double!  Otherwise,
+       we get extra fst/fld to
+       truncate precision */
+    int32_t i;
+    __asm__("fistl %0" : "=m"(i) : "t"(f));
+    return (i);
+}
+
+static inline int32_t float_to_int(float val)
+{
+    return double_to_int((double)val);
 }
 
 #endif
-
 
 #if 0
 #include <libc/endian.h>
@@ -84,11 +83,11 @@ static const double _double2fixmagic = 68719476736.0*1.5;
 static const int32_t _shiftamt        = 16;
 
 #if BYTE_ORDER == BIG_ENDIAN
-        #define iexp_                           0
-        #define iman_                           1
+#define iexp_ 0
+#define iman_ 1
 #else
-        #define iexp_                           1
-        #define iman_                           0
+#define iexp_ 1
+#define iman_ 0
 #endif
 
 // double_to_int

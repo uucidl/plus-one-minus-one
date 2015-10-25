@@ -2,15 +2,12 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/library/sock.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 806 */
-
-
-
 
 #include <library/sock.h>
 
@@ -19,11 +16,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-static
-void sigpipe_block() __attribute__((constructor));
+static void sigpipe_block() __attribute__((constructor));
 
-static
-void sigpipe_block()
+static void sigpipe_block()
 {
     sigset_t set;
     sigemptyset(&set);
@@ -38,8 +33,8 @@ int sock_open(int domain, int type, int protocol)
 
     errno = 0;
     do {
-	sock = socket(domain, type, protocol);
-    } while(sock < 0 && errno == EINTR);
+        sock = socket(domain, type, protocol);
+    } while (sock < 0 && errno == EINTR);
 
     return sock;
 }
@@ -56,10 +51,10 @@ int sock_get_recv_buffer_size(int socket)
     size_t pom = 0;
     socklen_t len = 0;
 
-    if(getsockopt(socket, SOL_SOCKET, SO_RCVBUF, &pom, &len) < 0) {
-	return -1;
+    if (getsockopt(socket, SOL_SOCKET, SO_RCVBUF, &pom, &len) < 0) {
+        return -1;
     } else
-	return pom;
+        return pom;
 }
 
 int sock_get_send_buffer_size(int socket)
@@ -67,21 +62,21 @@ int sock_get_send_buffer_size(int socket)
     size_t pom = 0;
     socklen_t len = 0;
 
-    if(getsockopt(socket, SOL_SOCKET, SO_SNDBUF, &pom, &len) < 0) {
-	return -1;
+    if (getsockopt(socket, SOL_SOCKET, SO_SNDBUF, &pom, &len) < 0) {
+        return -1;
     } else {
-	return pom;
+        return pom;
     }
 }
 
-int sock_connect(int socket, struct sockaddr* server_addr, socklen_t addrlen)
+int sock_connect(int socket, struct sockaddr *server_addr, socklen_t addrlen)
 {
     int err;
 
     errno = 0;
     do {
-	err = connect(socket, server_addr, addrlen);
-    } while(err < 0 && errno == EINTR);
+        err = connect(socket, server_addr, addrlen);
+    } while (err < 0 && errno == EINTR);
 
     return err;
 }
@@ -92,42 +87,36 @@ int sock_close(int socket)
 
     errno = 0;
     do {
-	err = close(socket);
-    } while(err < 0 && errno == EINTR);
+        err = close(socket);
+    } while (err < 0 && errno == EINTR);
 
     return err;
 }
 
-ssize_t sock_read(int socket, void* buffer, size_t size)
+ssize_t sock_read(int socket, void *buffer, size_t size)
 {
     int nbytes;
 
     errno = 0;
     do {
-	nbytes = read(socket, buffer, size);
-    } while(nbytes < 0 && errno == EINTR);
+        nbytes = read(socket, buffer, size);
+    } while (nbytes < 0 && errno == EINTR);
 
     return nbytes;
 }
 
-ssize_t sock_write(int socket, const void* buffer, size_t size)
+ssize_t sock_write(int socket, const void *buffer, size_t size)
 {
     int nbytes;
 
     errno = 0;
     do {
-	nbytes = write(socket, buffer, size);
-    } while(nbytes < 0 && errno == EINTR);
+        nbytes = write(socket, buffer, size);
+    } while (nbytes < 0 && errno == EINTR);
 
     return nbytes;
 }
 
-int sock_errno()
-{
-    return errno;
-}
+int sock_errno() { return errno; }
 
-void sock_perror(const char* msg)
-{
-    perror(msg);
-}
+void sock_perror(const char *msg) { perror(msg); }

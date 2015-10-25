@@ -1,6 +1,5 @@
 
 
-
 libmodplug v0.7 - A library for decoding MOD-like music formats.
  Based on the ModPlug sound engine by Olivier Lapicque <olivierl@jps.net>
  Ported to Unix by Kenton Varda <temporal@gauge3d.org>

@@ -1,15 +1,14 @@
 /* a10 889
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
- * You should have received this file ('src/system/opengl_to_video_frame_converter.h') with a license
- * agreement. ('LICENSE' file) 
+ * You should have received this file
+ *('src/system/opengl_to_video_frame_converter.h') with a license
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 889 */
-
-
 
 #ifndef KNOS_DEMOS_SYSTEM_OPENGL_TO_VIDEO_FRAME_CONVERTER_H
 #define KNOS_DEMOS_SYSTEM_OPENGL_TO_VIDEO_FRAME_CONVERTER_H
@@ -33,8 +32,7 @@
   So right now, it captures data from the (0, 0) point with the width
   and height of the destination video frame as the region to copy.
  */
-typedef struct opengl_to_video_frame_converter_t
-{
+typedef struct opengl_to_video_frame_converter_t {
     frame_converter_t super;
 
     unsigned int width;

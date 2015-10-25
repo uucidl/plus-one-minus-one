@@ -1,15 +1,14 @@
 /* a10 107
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
- * You should have received this file ('src/library/atomic_intptr.h') with a license
- * agreement. ('LICENSE' file) 
+ * You should have received this file ('src/library/atomic_intptr.h') with a
+ *license
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 107 */
-
-
 
 #ifndef KNOS_LIBRARY_ATOMIC_INTPTR_H
 #define KNOS_LIBRARY_ATOMIC_INTPTR_H
@@ -40,7 +39,6 @@
 
 #endif
 
-
 /*
   define platform dependant code.
  */
@@ -48,29 +46,31 @@
 
 typedef atomic_t atomic_intptr_impl_t;
 
-static inline
-void atomic_intptr_impl_instantiate(atomic_intptr_impl_t* x) {
+static inline void atomic_intptr_impl_instantiate(atomic_intptr_impl_t *x)
+{
     atomic_t temp = ATOMIC_INIT(0);
     *x = temp;
 }
 
-static inline
-intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t* x) {
+static inline intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t *x)
+{
     return atomic_read(x);
 }
 
-static inline
-void atomic_intptr_impl_set(atomic_intptr_impl_t* x, intptr_t i) {
+static inline void atomic_intptr_impl_set(atomic_intptr_impl_t *x, intptr_t i)
+{
     atomic_set(x, i);
 }
 
-static inline
-void atomic_intptr_impl_add(atomic_intptr_impl_t* x, intptr_t incr) {
+static inline void atomic_intptr_impl_add(atomic_intptr_impl_t *x,
+                                          intptr_t incr)
+{
     atomic_add(incr, x);
 }
 
-static inline
-void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
+static inline void atomic_intptr_impl_sub(atomic_intptr_impl_t *x,
+                                          intptr_t decr)
+{
     atomic_sub(decr, x);
 }
 
@@ -80,59 +80,62 @@ void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
 
 typedef LONG atomic_intptr_impl_t;
 
-static inline
-void atomic_intptr_impl_instantiate(atomic_intptr_impl_t* x) {
+static inline void atomic_intptr_impl_instantiate(atomic_intptr_impl_t *x)
+{
     // no op
 }
 
-static inline
-intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t* x) {
+static inline intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t *x)
+{
     return (*x);
 }
 
-static inline
-void atomic_intptr_impl_set(atomic_intptr_impl_t* x, intptr_t i) {
+static inline void atomic_intptr_impl_set(atomic_intptr_impl_t *x, intptr_t i)
+{
     InterlockedExchange(x, i);
 }
 
-static inline
-void atomic_intptr_impl_add(atomic_intptr_impl_t* x, intptr_t incr) {
+static inline void atomic_intptr_impl_add(atomic_intptr_impl_t *x,
+                                          intptr_t incr)
+{
     InterlockedExchangeAdd(x, incr);
 }
 
-static inline
-void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
+static inline void atomic_intptr_impl_sub(atomic_intptr_impl_t *x,
+                                          intptr_t decr)
+{
     InterlockedExchangeAdd(x, -decr);
 }
 
 #elif defined(MACOSX)
 
-
 typedef atomic_t atomic_intptr_impl_t;
 
-static inline
-void atomic_intptr_impl_instantiate(atomic_intptr_impl_t* x) {
+static inline void atomic_intptr_impl_instantiate(atomic_intptr_impl_t *x)
+{
     atomic_t temp = ATOMIC_INIT(0);
     *x = temp;
 }
 
-static inline
-intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t* x) {
+static inline intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t *x)
+{
     return atomic_read(x);
 }
 
-static inline
-void atomic_intptr_impl_set(atomic_intptr_impl_t* x, intptr_t i) {
+static inline void atomic_intptr_impl_set(atomic_intptr_impl_t *x, intptr_t i)
+{
     atomic_set(x, i);
 }
 
-static inline
-void atomic_intptr_impl_add(atomic_intptr_impl_t* x, intptr_t incr) {
+static inline void atomic_intptr_impl_add(atomic_intptr_impl_t *x,
+                                          intptr_t incr)
+{
     atomic_add(incr, x);
 }
 
-static inline
-void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
+static inline void atomic_intptr_impl_sub(atomic_intptr_impl_t *x,
+                                          intptr_t decr)
+{
     atomic_sub(decr, x);
 }
 
@@ -142,29 +145,31 @@ void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
 
 typedef atomic_t atomic_intptr_impl_t;
 
-static inline
-void atomic_intptr_impl_instantiate(atomic_intptr_impl_t* x) {
+static inline void atomic_intptr_impl_instantiate(atomic_intptr_impl_t *x)
+{
     atomic_t temp = ATOMIC_INIT(0);
     *x = temp;
 }
 
-static inline
-intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t* x) {
+static inline intptr_t atomic_intptr_impl_get(atomic_intptr_impl_t *x)
+{
     return atomic_read(x);
 }
 
-static inline
-void atomic_intptr_impl_set(atomic_intptr_impl_t* x, intptr_t i) {
+static inline void atomic_intptr_impl_set(atomic_intptr_impl_t *x, intptr_t i)
+{
     atomic_set(x, i);
 }
 
-static inline
-void atomic_intptr_impl_add(atomic_intptr_impl_t* x, intptr_t incr) {
+static inline void atomic_intptr_impl_add(atomic_intptr_impl_t *x,
+                                          intptr_t incr)
+{
     atomic_add(incr, x);
 }
 
-static inline
-void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
+static inline void atomic_intptr_impl_sub(atomic_intptr_impl_t *x,
+                                          intptr_t decr)
+{
     atomic_sub(decr, x);
 }
 
@@ -172,31 +177,30 @@ void atomic_intptr_impl_sub(atomic_intptr_impl_t* x, intptr_t decr) {
 #error "Please implement atomic primitives for that architecture / processor"
 #endif
 
-typedef struct atomic_intptr_t
-{
+typedef struct atomic_intptr_t {
     object_t super;
     atomic_intptr_impl_t impl;
 } atomic_intptr_t;
 
 CLASS_INHERIT(atomic_intptr, object);
 
-static inline
-intptr_t atomic_intptr_get(atomic_intptr_t* x) {
+static inline intptr_t atomic_intptr_get(atomic_intptr_t *x)
+{
     return atomic_intptr_impl_get(&x->impl);
 }
 
-static inline
-void atomic_intptr_set(atomic_intptr_t* x, intptr_t i) {
+static inline void atomic_intptr_set(atomic_intptr_t *x, intptr_t i)
+{
     atomic_intptr_impl_set(&x->impl, i);
 }
 
-static inline
-void atomic_intptr_add(atomic_intptr_t* x, intptr_t incr) {
+static inline void atomic_intptr_add(atomic_intptr_t *x, intptr_t incr)
+{
     atomic_intptr_impl_add(&x->impl, incr);
 }
 
-static inline
-void atomic_intptr_sub(atomic_intptr_t* x, intptr_t decr) {
+static inline void atomic_intptr_sub(atomic_intptr_t *x, intptr_t decr)
+{
     atomic_intptr_impl_sub(&x->impl, decr);
 }
 

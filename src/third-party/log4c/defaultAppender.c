@@ -11,7 +11,7 @@
 //    documentation and/or other materials provided with the distribution.
 // 3. The name of the author may not be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -35,47 +35,39 @@
  */
 
 static char *priorityNames[] = {
-    "Zero Priority",
-    "TRACE",
-    "DEBUG",
-    "INFO",
-    "NOTICE",
-    "WARNING",
-    "ERROR",
-    "CRITICAL ERROR",
-    "ALERT",
-    "EMERGENCY",
+    "Zero Priority", "TRACE", "DEBUG",          "INFO",  "NOTICE",
+    "WARNING",       "ERROR", "CRITICAL ERROR", "ALERT", "EMERGENCY",
 };
 
-static void doAppend(struct LogAppender* this, struct LogEvent* ev);
+static void doAppend(struct LogAppender *this, struct LogEvent *ev);
 
 static struct DefaultLogAppender {
     struct LogAppender appender;
     FILE *file;
-} defaultLogAppender = { { doAppend }, NULL } ;
+} defaultLogAppender = {{doAppend}, NULL};
 
-struct LogAppender* log_defaultLogAppender  = &defaultLogAppender.appender;
+struct LogAppender *log_defaultLogAppender = &defaultLogAppender.appender;
 
-static void doAppend(struct LogAppender* this0, struct LogEvent* ev) {
+static void doAppend(struct LogAppender *this0, struct LogEvent *ev)
+{
 
     // TODO: define a format field in struct for timestamp, etc.
     char *pn = "default";
     char buf[20];
-    struct DefaultLogAppender* this = (struct DefaultLogAppender*)this0;
-    
-    if (this->file == NULL) this->file = stderr;
-    
-    int priorityNames_n = sizeof(priorityNames)/sizeof(char*);
+    struct DefaultLogAppender *this = (struct DefaultLogAppender *)this0;
+
+    if (this->file == NULL)
+        this->file = stderr;
+
+    int priorityNames_n = sizeof(priorityNames) / sizeof(char *);
 
     if (ev->priority < 0) {
         pn = "Negative Priority NOT ALLOWED!!";
-    }
-    else if (ev->priority < priorityNames_n) {
+    } else if (ev->priority < priorityNames_n) {
         pn = priorityNames[ev->priority];
     } else {
-        sprintf(buf, "%s+%ld",
-                priorityNames[priorityNames_n-1],
-                (long) ev->priority - priorityNames_n + 1);
+        sprintf(buf, "%s+%ld", priorityNames[priorityNames_n - 1],
+                (long)ev->priority - priorityNames_n + 1);
     }
 #if defined(KOS)
     printf("%-7s ", pn);
@@ -93,7 +85,8 @@ static void doAppend(struct LogAppender* this0, struct LogEvent* ev) {
     pspDebugScreenPrintf("\n");
 #else
     fprintf(this->file, "%-7s ", pn);
-    fprintf(this->file, "%s:%d: (%s) ", ev->fileName, ev->lineNum, ev->functionName);
+    fprintf(this->file, "%s:%d: (%s) ", ev->fileName, ev->lineNum,
+            ev->functionName);
     vfprintf(this->file, ev->fmt, ev->ap);
     fprintf(this->file, "\n");
 #endif

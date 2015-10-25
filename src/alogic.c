@@ -9,9 +9,6 @@
  * full acceptance and understanding.
  * e 823 */
 
-
-
-
 #include "alogic.h"
 
 #include <libc/stdlib.h>
@@ -20,15 +17,14 @@
 #include <system/main.h>
 #include <system/pan.h>
 
-static
-int alogic_new(effect_t* self)
+static int alogic_new(effect_t *self)
 {
-    alogic_t* alogic = (alogic_t*) self;
+    alogic_t *alogic = (alogic_t *)self;
 
     _8pu_init(&alogic->state, 127);
 
-    chamberlin_2p_instantiate_toplevel (&alogic->filter);
-    alogic->filter.super.super.new((effect_t*) &alogic->filter);
+    chamberlin_2p_instantiate_toplevel(&alogic->filter);
+    alogic->filter.super.super.new((effect_t *)&alogic->filter);
 
     alogic->state.ops[0].opcode = ADD;
     alogic->state.ops[0].parameter = 1;
@@ -43,91 +39,89 @@ int alogic_new(effect_t* self)
     alogic->xor_code = malloc(1024); /* code gen section */
 
     /* lets precompile */
-    if(alogic->state.ops[1].opcode == XOR) {
-	_8pu_specialize(&alogic->state, alogic->xor_code);
-	alogic->state.ops[1].opcode = AND;
-	_8pu_specialize(&alogic->state, alogic->and_code);
-	alogic->state.ops[1].opcode = XOR;
-	alogic->nexter = (gen_t) alogic->xor_code;
+    if (alogic->state.ops[1].opcode == XOR) {
+        _8pu_specialize(&alogic->state, alogic->xor_code);
+        alogic->state.ops[1].opcode = AND;
+        _8pu_specialize(&alogic->state, alogic->and_code);
+        alogic->state.ops[1].opcode = XOR;
+        alogic->nexter = (gen_t)alogic->xor_code;
     } else {
-	_8pu_specialize(&alogic->state, alogic->and_code);
-	alogic->state.ops[1].opcode = XOR;
-	_8pu_specialize(&alogic->state, alogic->xor_code);
-	alogic->state.ops[1].opcode = AND;
-	alogic->nexter = (gen_t) alogic->and_code;
+        _8pu_specialize(&alogic->state, alogic->and_code);
+        alogic->state.ops[1].opcode = XOR;
+        _8pu_specialize(&alogic->state, alogic->xor_code);
+        alogic->state.ops[1].opcode = AND;
+        alogic->nexter = (gen_t)alogic->and_code;
     }
 #endif
 
     return 1;
 }
 
-static
-int alogic_destroy (effect_t* zelf)
+static int alogic_destroy(effect_t *zelf)
 {
-    alogic_t* self = (alogic_t*) zelf;
-    self->filter.super.super.destroy (&self->filter.super.super);
-    chamberlin_2p_retire (&self->filter);
+    alogic_t *self = (alogic_t *)zelf;
+    self->filter.super.super.destroy(&self->filter.super.super);
+    chamberlin_2p_retire(&self->filter);
 
     return 1;
 }
 
-static
-void alogic_set_area_parameters(audio_effect_t* ae,
-			   int sample_rate, int frame_number, int frame_size)
+static void alogic_set_area_parameters(audio_effect_t *ae, int sample_rate,
+                                       int frame_number, int frame_size)
 {
-    alogic_t* self = (alogic_t*) ae;
+    alogic_t *self = (alogic_t *)ae;
 
-    ae->sample_rate  = sample_rate;
+    ae->sample_rate = sample_rate;
     ae->frame_number = frame_number;
-    ae->frame_size   = frame_size;
+    ae->frame_size = frame_size;
 
-    self->filter.super.set_area_parameters((audio_effect_t*) &self->filter,
-					   ae->sample_rate,
-					   ae->frame_number, ae->frame_size);
+    self->filter.super.set_area_parameters((audio_effect_t *)&self->filter,
+                                           ae->sample_rate, ae->frame_number,
+                                           ae->frame_size);
     self->filter.set_cutoff(&self->filter, 8000.0);
     self->filter.set_resonance(&self->filter, 0.22);
 
-    self->block = calloc(sizeof(unsigned char),
-			 ae->sample_rate/363.0);
+    self->block = calloc(sizeof(unsigned char), ae->sample_rate / 363.0);
 }
 
-#define AMP(a) (sample_t)((a-127)/127.0f)
+#define AMP(a) (sample_t)((a - 127) / 127.0f)
 
-static void alogic_computes_area(audio_effect_t* self, audio_area_t* area, double ms) __attribute__((unused));
+static void alogic_computes_area(audio_effect_t *self, audio_area_t *area,
+                                 double ms) __attribute__((unused));
 
-static
-void alogic_computes_area(audio_effect_t* self, audio_area_t* area, double ms)
+static void alogic_computes_area(audio_effect_t *self, audio_area_t *area,
+                                 double ms)
 {
-    alogic_t* alogic = (alogic_t*) self;
-    sample_t* __restrict__ samples = area->samples + area->head*alogic->super.frame_size;
+    alogic_t *alogic = (alogic_t *)self;
+    sample_t *__restrict__ samples =
+        area->samples + area->head * alogic->super.frame_size;
     int i = 0;
     int n = area->frame_number;
 
-    alogic->nz = alogic->super.sample_rate/363.0;
-    alogic->ny = alogic->super.sample_rate/2909.0;
+    alogic->nz = alogic->super.sample_rate / 363.0;
+    alogic->ny = alogic->super.sample_rate / 2909.0;
 
-    alogic->state.ops[1].parameter = ((int) ms % 8000) * 256 / 8000;
-    alogic->state.ops[2].parameter = (-cos(ms / 20000)/2 + 0.5) * 256;
-    while(n--) {
-	sample_t val;
-	_8pu_next(&alogic->state);
-	val = AMP(alogic->state.accum);
-	samples[i] = val;
-	samples[i+1] = val;
-	if(!(alogic->i % alogic->nz)) {
-	    if(alogic->state.ops[1].opcode == XOR)
-		alogic->state.ops[1].opcode = AND;
-	    else
-		alogic->state.ops[1].opcode = XOR;
-	}
-	if(!(alogic->i % alogic->ny)) {
-	    alogic->state.ops[0].parameter++;
-	}
-	alogic->i++;
-	i += alogic->super.frame_size;
+    alogic->state.ops[1].parameter = ((int)ms % 8000) * 256 / 8000;
+    alogic->state.ops[2].parameter = (-cos(ms / 20000) / 2 + 0.5) * 256;
+    while (n--) {
+        sample_t val;
+        _8pu_next(&alogic->state);
+        val = AMP(alogic->state.accum);
+        samples[i] = val;
+        samples[i + 1] = val;
+        if (!(alogic->i % alogic->nz)) {
+            if (alogic->state.ops[1].opcode == XOR)
+                alogic->state.ops[1].opcode = AND;
+            else
+                alogic->state.ops[1].opcode = XOR;
+        }
+        if (!(alogic->i % alogic->ny)) {
+            alogic->state.ops[0].parameter++;
+        }
+        alogic->i++;
+        i += alogic->super.frame_size;
     }
-    alogic->filter.super.super.computes((effect_t*) &alogic->filter,
-					area, ms);
+    alogic->filter.super.super.computes((effect_t *)&alogic->filter, area, ms);
 }
 
 #ifdef USE_CG
@@ -182,50 +176,50 @@ void alogic_computes_area_cg(audio_effect_t* self, audio_area_t* area, double ms
 #endif
 
 /* using non static parameter specialization */
-static
-void alogic_computes_area_cg_2(audio_effect_t* self, audio_area_t* area, double ms)
+static void alogic_computes_area_cg_2(audio_effect_t *self, audio_area_t *area,
+                                      double ms)
 {
-    alogic_t* alogic = (alogic_t*) self;
-    sample_t* __restrict__ samples = area->samples + area->head*alogic->super.frame_size;
+    alogic_t *alogic = (alogic_t *)self;
+    sample_t *__restrict__ samples =
+        area->samples + area->head * alogic->super.frame_size;
     int i = 0;
     int n = area->frame_number;
 
-    alogic->nz = alogic->super.sample_rate/363.0;
-    alogic->ny = alogic->super.sample_rate/2909.0;
+    alogic->nz = alogic->super.sample_rate / 363.0;
+    alogic->ny = alogic->super.sample_rate / 2909.0;
 
-    alogic->state.ops[1].parameter = ((int) ms % 8000) * 256 / 8000;
-    alogic->state.ops[2].parameter = (-cos(ms / 20000)/2 + 0.5) * 256;
+    alogic->state.ops[1].parameter = ((int)ms % 8000) * 256 / 8000;
+    alogic->state.ops[2].parameter = (-cos(ms / 20000) / 2 + 0.5) * 256;
 
+    while (n--) {
+        sample_t val;
+        alogic->nexter();
+        val = AMP(alogic->state.accum);
+        samples[i] = val;
+        samples[i + 1] = val;
+        if (!(alogic->i % alogic->nz)) {
+            if (alogic->state.ops[1].opcode == XOR) {
+                alogic->state.ops[1].opcode = AND;
+                alogic->nexter = (gen_t)alogic->and_code;
+            } else {
+                alogic->state.ops[1].opcode = XOR;
+                alogic->nexter = (gen_t)alogic->xor_code;
+            }
+        }
+        if (!(alogic->i % alogic->ny)) {
+            alogic->state.ops[0].parameter++;
+        }
 
-    while(n--) {
-	sample_t val;
-	alogic->nexter();
-	val = AMP(alogic->state.accum);
-	samples[i] = val;
-	samples[i+1] = val;
-	if(!(alogic->i % alogic->nz)) {
-	    if(alogic->state.ops[1].opcode == XOR) {
-		alogic->state.ops[1].opcode = AND;
-		alogic->nexter = (gen_t) alogic->and_code;
-	    } else {
-		alogic->state.ops[1].opcode = XOR;
-		alogic->nexter = (gen_t) alogic->xor_code;
-	    }
-	}
-	if(!(alogic->i % alogic->ny)) {
-	    alogic->state.ops[0].parameter++;
-	}
-
-	alogic->i++;
-	i += alogic->super.frame_size;
+        alogic->i++;
+        i += alogic->super.frame_size;
     }
-    alogic->filter.super.super.computes((effect_t*) &alogic->filter, area, ms);
+    alogic->filter.super.super.computes((effect_t *)&alogic->filter, area, ms);
 }
 #endif
 
-alogic_t* alogic_instantiate(alogic_t* x)
+alogic_t *alogic_instantiate(alogic_t *x)
 {
-    alogic_t* alogic = alogic_instantiate_super (x);
+    alogic_t *alogic = alogic_instantiate_super(x);
 
     alogic->super.super.new = alogic_new;
     alogic->super.super.destroy = alogic_destroy;

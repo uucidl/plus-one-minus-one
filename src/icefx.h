@@ -2,17 +2,15 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/icefx.h') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 466 */
 
-
-
 #ifndef ICEFX_H
-  #define ICEFX_H
+#define ICEFX_H
 
 #include <system/effects.h>
 #include <freetype/ft_renderer.h>
@@ -21,14 +19,13 @@
 
 #include "ice.h"
 
-typedef struct icefx_t
-{
+typedef struct icefx_t {
     video_effect_t super;
 
-    void (*throw)(struct icefx_t* self, double now);
+    void (*throw)(struct icefx_t *self, double now);
 
     int count;
-    ice_t* ice; /* ice objects */
+    ice_t *ice; /* ice objects */
     unsigned int alpha;
 
     double onset_ms;

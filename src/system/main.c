@@ -13,13 +13,13 @@
 
 #if defined(LINUX) || defined(MACOSX)
 
-extern int default_main_loop(demo_t* demo);
-#  define os_main_loop default_main_loop
+extern int default_main_loop(demo_t *demo);
+#define os_main_loop default_main_loop
 
 #elif defined(WIN32)
 
-extern int win32_main_loop(demo_t* demo);
-#  define os_main_loop win32_main_loop
+extern int win32_main_loop(demo_t *demo);
+#define os_main_loop win32_main_loop
 
 #else
 
@@ -27,7 +27,4 @@ extern int win32_main_loop(demo_t* demo);
 
 #endif
 
-int main_loop(demo_t* demo)
-{
-	return os_main_loop(demo);
-}
+int main_loop(demo_t *demo) { return os_main_loop(demo); }

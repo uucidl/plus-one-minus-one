@@ -2,14 +2,12 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/system/event.h') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 788 */
-
-
 
 #ifndef KNOS_DEMOS_SYSTEM_EVENT_H
 #define KNOS_DEMOS_SYSTEM_EVENT_H
@@ -19,24 +17,23 @@
 #include <library/strings.h>
 #include <library/memory.h>
 
-typedef struct event_t
-{
-    object_t     super;
-    bytecode_t*  hierarchy;
+typedef struct event_t {
+    object_t super;
+    bytecode_t *hierarchy;
     int size;
 } event_t;
 
 CLASS_INHERIT(event, object);
 
-int event_new (event_t* e, unsigned int size);
-int event_new_from_string (event_t* e, const string_t* string);
-int event_new_from_cstring (event_t* e, const char* string);
-int event_new_from_bytecode_stream (event_t* e, bytecode_stream_t* stream);
-int event_match_p (const event_t* self, const event_t* event);
-int event_equals (const event_t* a, const event_t* b);
-event_t* event_copy (const event_t* self, event_t* to);
-char* event_as_cstring (const event_t* self);
-int event_destroy (event_t* e);
+int event_new(event_t *e, unsigned int size);
+int event_new_from_string(event_t *e, const string_t *string);
+int event_new_from_cstring(event_t *e, const char *string);
+int event_new_from_bytecode_stream(event_t *e, bytecode_stream_t *stream);
+int event_match_p(const event_t *self, const event_t *event);
+int event_equals(const event_t *a, const event_t *b);
+event_t *event_copy(const event_t *self, event_t *to);
+char *event_as_cstring(const event_t *self);
+int event_destroy(event_t *e);
 
 /*--- key event ----------------------------------------------*/
 
@@ -50,9 +47,9 @@ typedef event_t key_event_t;
 "key", "up", "down" ++ key symbols
 */
 
-static inline
-object_t* key_event_to_object(key_event_t* x) {
-  return event_to_object(x);
+static inline object_t *key_event_to_object(key_event_t *x)
+{
+    return event_to_object(x);
 }
 
 DEFINE_OBJECT_INSTANTIATE(key_event);
@@ -73,19 +70,19 @@ typedef event_t mouse_button_event_t;
 "mouse", "move" "button" "up", "down", "lmb", "mmb", "rmb"
 */
 
-static inline
-object_t* mouse_event_to_object(mouse_event_t* x) {
-  return event_to_object(x);
+static inline object_t *mouse_event_to_object(mouse_event_t *x)
+{
+    return event_to_object(x);
 }
 
-static inline
-object_t* mouse_move_event_to_object(mouse_event_t* x) {
-  return event_to_object(x);
+static inline object_t *mouse_move_event_to_object(mouse_event_t *x)
+{
+    return event_to_object(x);
 }
 
-static inline
-object_t* mouse_button_event_to_object(mouse_event_t* x) {
-  return event_to_object(x);
+static inline object_t *mouse_button_event_to_object(mouse_event_t *x)
+{
+    return event_to_object(x);
 }
 
 DEFINE_OBJECT_INSTANTIATE(mouse_event);
@@ -102,21 +99,20 @@ typedef event_t drop_event_t;
    as it will be cleaned up after accept has been called.
 */
 
-static inline
-object_t* drop_event_to_object(drop_event_t* x) {
-  return event_to_object(x);
+static inline object_t *drop_event_to_object(drop_event_t *x)
+{
+    return event_to_object(x);
 }
 
 DEFINE_OBJECT_INSTANTIATE(drop_event);
 
 /*--- signature -----------------------------------------------*/
 
-typedef struct signature_t
-{
+typedef struct signature_t {
     event_t super;
 
     /* returns true if event matches signature self */
-    int (*match_event_p)(struct signature_t* self, const struct event_t* event);
+    int (*match_event_p)(struct signature_t *self, const struct event_t *event);
 } signature_t;
 
 /*
@@ -126,6 +122,6 @@ typedef struct signature_t
 
 CLASS_INHERIT(signature, event)
 
-signature_t* signature_instantiate(signature_t* x);
+signature_t *signature_instantiate(signature_t *x);
 
 #endif

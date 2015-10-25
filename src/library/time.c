@@ -9,7 +9,6 @@
  * full acceptance and understanding.
  * e 554 */
 
-
 #include <library/time.h>
 
 #if defined(WIN32)
@@ -21,17 +20,17 @@ static int freq_p = 0;
 
 double get_milliseconds()
 {
-  double t;
-  static LARGE_INTEGER now;
+    double t;
+    static LARGE_INTEGER now;
 
-  if(!freq_p) {
-      QueryPerformanceFrequency(&freq);
-      freq_p = 1;
-  }
-  QueryPerformanceCounter(&now);
-  t = 1000.0 * now.QuadPart / freq.QuadPart;
+    if (!freq_p) {
+        QueryPerformanceFrequency(&freq);
+        freq_p = 1;
+    }
+    QueryPerformanceCounter(&now);
+    t = 1000.0 * now.QuadPart / freq.QuadPart;
 
-  return t;
+    return t;
 }
 
 #include <sys/timeb.h>
@@ -42,10 +41,10 @@ double get_milliseconds()
 
 double get_unix_milliseconds()
 {
-  struct _timeb now;
-  _ftime(&now);
+    struct _timeb now;
+    _ftime(&now);
 
-  return 1000.0*now.time + now.millitm;
+    return 1000.0 * now.time + now.millitm;
 }
 
 #elif defined(LINUX)
@@ -65,13 +64,13 @@ extern double get_milliseconds()
 
 extern double get_unix_milliseconds()
 {
-	struct timeval tv;
-	double t;
+    struct timeval tv;
+    double t;
 
-	gettimeofday(&tv, NULL);
-	t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
+    gettimeofday(&tv, NULL);
+    t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
 
-	return t;
+    return t;
 }
 
 #elif defined(MACOSX)
@@ -88,34 +87,32 @@ static void clock_init() __attribute__((constructor));
 
 static void clock_init()
 {
-	mach_timebase_info_data_t info;
-	if (mach_timebase_info (&info))
-	{
-		ERROR1("Could not initialize clock");
-		return;
-	}
+    mach_timebase_info_data_t info;
+    if (mach_timebase_info(&info)) {
+        ERROR1("Could not initialize clock");
+        return;
+    }
 
-	timebase_info = info;
+    timebase_info = info;
 }
 
 extern double get_milliseconds()
 {
-	double micros = mach_absolute_time() *
-		timebase_info.numer /
-		timebase_info.denom / 1000;
+    double micros =
+        mach_absolute_time() * timebase_info.numer / timebase_info.denom / 1000;
 
-	return micros / 1000.0;
+    return micros / 1000.0;
 }
 
 extern double get_unix_milliseconds()
 {
-	struct timeval tv;
-	double t;
+    struct timeval tv;
+    double t;
 
-	gettimeofday(&tv, NULL);
-	t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
+    gettimeofday(&tv, NULL);
+    t = (1000.0 * tv.tv_sec) + (tv.tv_usec / 1000.0);
 
-	return t;
+    return t;
 }
 
 #else

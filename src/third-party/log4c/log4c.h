@@ -228,71 +228,68 @@
  *@{
  */
 
-#define LP_NONE           0
-#define LP_TRACE          1
-#define LP_DEBUG          2
-#define LP_INFO           3
-#define LP_NOTICE         4
-#define LP_WARNING	  5
-#define LP_ERROR          6
-#define LP_CRITICAL       7
-#define LP_ALERT          8
-#define LP_EMERGENCY      9
+#define LP_NONE 0
+#define LP_TRACE 1
+#define LP_DEBUG 2
+#define LP_INFO 3
+#define LP_NOTICE 4
+#define LP_WARNING 5
+#define LP_ERROR 6
+#define LP_CRITICAL 7
+#define LP_ALERT 8
+#define LP_EMERGENCY 9
 
-#define LP_UNINITIALIZED  -1    ///< for internal use only
+#define LP_UNINITIALIZED -1 ///< for internal use only
 
 #ifndef LOG_STATIC_THRESHOLD
 /**
  * All logging with priority < LOG_STATIC_THRESHOLD is disabled at compile
  * time, i.e., compiled out.
  */
-  #define LOG_STATIC_THRESHOLD LP_NONE
+#define LOG_STATIC_THRESHOLD LP_NONE
 #endif
 
 /*@}*/
 
 /** Transforms a category name to a global variable name. */
-#define _LOGV(cat)   _LOG_CONCAT(_log_c, cat)
-#define _LOG_CONCAT(x,y) x ## y
+#define _LOGV(cat) _LOG_CONCAT(_log_c, cat)
+#define _LOG_CONCAT(x, y) x##y
 
 /** The root of the category hierarchy. */
-#define LOG_ROOT_CAT   LogRoot
+#define LOG_ROOT_CAT LogRoot
 
 /** Defines a new subcategory of the parent. */
-#define LOG_NEW_SUBCATEGORY(catName, parent)    \
-    extern struct LogCategory _LOGV(parent);    \
-    struct LogCategory _LOGV(catName) = {       \
-	&_LOGV(parent), 0, 0,                   \
-	#catName, LP_UNINITIALIZED, 1,          \
-	0, 1                                    \
-    };
+#define LOG_NEW_SUBCATEGORY(catName, parent)                                   \
+    extern struct LogCategory _LOGV(parent);                                   \
+    struct LogCategory _LOGV(catName) = {&_LOGV(parent), 0, 0, #catName,       \
+                                         LP_UNINITIALIZED, 1, 0, 1};
 
 /**
  * Creates a new subcategory of the root category.
  */
-#define LOG_NEW_CATEGORY(catName)  LOG_NEW_SUBCATEGORY(catName, LOG_ROOT_CAT)
+#define LOG_NEW_CATEGORY(catName) LOG_NEW_SUBCATEGORY(catName, LOG_ROOT_CAT)
 
 /**
  * Creates a new subcategory of the root category.
  */
 
-#define _LOG_DEFAULT_CATEGORY(cname) \
-	static struct LogCategory* _log_defaultCategory = &_LOGV(cname);
+#define _LOG_DEFAULT_CATEGORY(cname)                                           \
+    static struct LogCategory *_log_defaultCategory = &_LOGV(cname);
 
 /**
  * Creates a new subcategory of the root category and makes it the default
  * (used by macros that don't explicitly specify a category).
  */
-#define LOG_NEW_DEFAULT_CATEGORY(cname)         \
-    LOG_NEW_CATEGORY(cname);                    \
+#define LOG_NEW_DEFAULT_CATEGORY(cname)                                        \
+    LOG_NEW_CATEGORY(cname);                                                   \
     _LOG_DEFAULT_CATEGORY(cname);
 
 /**
  * Creates a new subcategory of the parent category and makes it the default
  * (used by macros that don't explicitly specify a category).
  */
-#define LOG_NEW_DEFAULT_SUBCATEGORY(cname, parent)      \
-    LOG_NEW_SUBCATEGORY(cname, parent);                 \
+#define LOG_NEW_DEFAULT_SUBCATEGORY(cname, parent)                             \
+    LOG_NEW_SUBCATEGORY(cname, parent);                                        \
     _LOG_DEFAULT_CATEGORY(cname);
 
 // Functions you may call
@@ -314,7 +311,7 @@
  *
  * @todo should allow symbolic priority values.
  */
-extern const char* log_setControlString(const char* cs);
+extern const char *log_setControlString(const char *cs);
 
 // Forward declarations
 struct LogAppender;
@@ -335,15 +332,15 @@ struct LogCategory {
 };
 
 struct LogAppender {
-    void (*doAppend) (struct LogAppender* thisLogAppender,
-		      struct LogEvent* event);
+    void (*doAppend)(struct LogAppender *thisLogAppender,
+                     struct LogEvent *event);
 };
 
 struct LogEvent {
-    struct LogCategory* cat;
+    struct LogCategory *cat;
     int priority;
-    const char* fileName;
-    const char* functionName;
+    const char *fileName;
+    const char *functionName;
     int lineNum;
     const char *fmt;
     va_list ap;
@@ -352,22 +349,22 @@ struct LogEvent {
 /**
  * Programatically alters a category's threshold priority.
  */
-extern void log_setThreshold(struct LogCategory* cat, int thresholdPriority);
+extern void log_setThreshold(struct LogCategory *cat, int thresholdPriority);
 
 /**
  * Programatically alter a category's parent.
  */
-extern void log_setParent(struct LogCategory* cat, struct LogCategory* parent);
+extern void log_setParent(struct LogCategory *cat, struct LogCategory *parent);
 
 /**
  * Sets the category's appender.
  */
-extern void log_setAppender(struct LogCategory* cat, struct LogAppender* app);
+extern void log_setAppender(struct LogCategory *cat, struct LogAppender *app);
 
 // Functions that you shouldn't call.
-extern void _log_logEvent(struct LogCategory* category,
-			  struct LogEvent*ev,...);
-extern int _log_initCat(int priority, struct LogCategory* category);
+extern void _log_logEvent(struct LogCategory *category, struct LogEvent *ev,
+                          ...);
+extern int _log_initCat(int priority, struct LogCategory *category);
 
 extern struct LogCategory _LOGV(LOG_ROOT_CAT);
 extern struct LogAppender *log_defaultLogAppender;
@@ -378,8 +375,8 @@ extern struct LogAppender *log_defaultLogAppender;
  * command and used only within it, you should make its evaluation conditional
  * using this macro.
  */
-#define LOG_ISENABLED(catName, priority) \
-	    _LOG_ISENABLEDV(_LOGV(catName), priority)
+#define LOG_ISENABLED(catName, priority)                                       \
+    _LOG_ISENABLEDV(_LOGV(catName), priority)
 
 /**
  * Helper function that implements LOG_ISENABLED.
@@ -388,11 +385,11 @@ extern struct LogAppender *log_defaultLogAppender;
  * First part is a compile-time constant.
  * Call to _log_initCat only happens once.
  */
-#define _LOG_ISENABLEDV(catv, priority)                         \
-       (priority >= LOG_STATIC_THRESHOLD                        \
-	&& priority >= (catv).thresholdPriority                 \
-	&& ((catv).thresholdPriority != LP_UNINITIALIZED        \
-	    || _log_initCat(priority, &(catv))) )
+#define _LOG_ISENABLEDV(catv, priority)                                        \
+    (priority >= LOG_STATIC_THRESHOLD &&                                       \
+     priority >= (catv).thresholdPriority &&                                   \
+     ((catv).thresholdPriority != LP_UNINITIALIZED ||                          \
+      _log_initCat(priority, &(catv))))
 
 /**
  * @name Internal Macros
@@ -407,21 +404,24 @@ extern struct LogAppender *log_defaultLogAppender;
  * Setting the LogEvent's valist member is done inside _log_logEvent.
  */
 //@{
-#define _LOG_PRE(catv, priority, fmt) do {                              \
-     if (_LOG_ISENABLEDV(catv, priority)) {                             \
-	 struct LogEvent _log_ev =                                      \
-	{&(catv),priority,__FILE__,__PRETTY_FUNCTION__,__LINE__, fmt }; \
-	 _log_logEvent(&(catv), &_log_ev
-#define _LOG_POST                               \
-			);                      \
-     } } while(0)
+#define _LOG_PRE(catv, priority, fmt)                                          \
+    do {                                                                       \
+        if (_LOG_ISENABLEDV(catv, priority)) {                                 \
+            struct LogEvent _log_ev = {&(catv), priority, __FILE__,            \
+                                       __PRETTY_FUNCTION__, __LINE__, fmt};    \
+         _log_logEvent(&(catv), &_log_ev
+#define _LOG_POST                                                              \
+                        );                                                     \
+    }                                                                          \
+    }                                                                          \
+    while (0)
 //@}
 
 /** @name Logging Macros */
 //@{
 // Thank God for Emacs...
 // Many repetitions follow...
-#define CLOG3(c, p, f) _LOG_PRE(_LOGV(c),p,f) _LOG_POST
+#define CLOG3(c, p, f) _LOG_PRE(_LOGV(c), p, f) _LOG_POST
 #define CTRACE2(c, f) CLOG3(c, LP_TRACE, f)
 #define CDEBUG2(c, f) CLOG3(c, LP_DEBUG, f)
 #define CINFO2(c, f) CLOG3(c, LP_INFO, f)
@@ -431,141 +431,230 @@ extern struct LogAppender *log_defaultLogAppender;
 #define CCRITICAL2(c, f) CLOG3(c, LP_CRITICAL, f)
 #define CALERT2(c, f) CLOG3(c, LP_ALERT, f)
 #define CEMERGENCY2(c, f) CLOG3(c, LP_EMERGENCY, f)
-#define LOG2(p, f)    _LOG_PRE(*_log_defaultCategory, p, f) _LOG_POST
-#define INFO1(f)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) _LOG_POST
-#define NOTICE1(f)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) _LOG_POST
-#define TRACE1(f)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) _LOG_POST
-#define DEBUG1(f)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) _LOG_POST
-#define WARNING1(f)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) _LOG_POST
-#define ERROR1(f)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) _LOG_POST
-#define CRITICAL1(f)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) _LOG_POST
-#define ALERT1(f)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f)  _LOG_POST
-#define EMERGENCY1(f) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f)  _LOG_POST
+#define LOG2(p, f) _LOG_PRE(*_log_defaultCategory, p, f) _LOG_POST
+#define INFO1(f) _LOG_PRE(*_log_defaultCategory, LP_INFO, f) _LOG_POST
+#define NOTICE1(f) _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) _LOG_POST
+#define TRACE1(f) _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) _LOG_POST
+#define DEBUG1(f) _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) _LOG_POST
+#define WARNING1(f) _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) _LOG_POST
+#define ERROR1(f) _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) _LOG_POST
+#define CRITICAL1(f) _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) _LOG_POST
+#define ALERT1(f) _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) _LOG_POST
+#define EMERGENCY1(f) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) _LOG_POST
 // Many repetitions follow...
-#define CLOG4(c, p, f,a1) _LOG_PRE(_LOGV(c),p,f) ,a1 _LOG_POST
-#define CTRACE3(c, f,a1) CLOG4(c, LP_TRACE, f,a1)
-#define CDEBUG3(c, f,a1) CLOG4(c, LP_DEBUG, f,a1)
-#define CINFO3(c, f,a1) CLOG4(c, LP_INFO, f,a1)
-#define CNOTICE3(c, f,a1) CLOG4(c, LP_NOTICE, f,a1)
-#define CWARNING3(c, f,a1) CLOG4(c, LP_WARNING, f,a1)
-#define CERROR3(c, f,a1) CLOG4(c, LP_ERROR, f,a1)
-#define CCRITICAL3(c, f,a1) CLOG4(c, LP_CRITICAL, f,a1)
-#define CALERT3(c, f,a1) CLOG4(c, LP_ALERT, f,a1)
-#define CEMERGENCY3(c, f,a1) CLOG4(c, LP_EMERGENCY, f,a1)
-#define LOG3(p, f,a1)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1 _LOG_POST
-#define INFO2(f,a1)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1 _LOG_POST
-#define NOTICE2(f,a1)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1 _LOG_POST
-#define TRACE2(f,a1)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1 _LOG_POST
-#define DEBUG2(f,a1)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1 _LOG_POST
-#define WARNING2(f,a1)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1 _LOG_POST
-#define ERROR2(f,a1)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1 _LOG_POST
-#define CRITICAL2(f,a1)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1 _LOG_POST
-#define ALERT2(f,a1)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1 _LOG_POST
-#define EMERGENCY2(f,a1) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1  _LOG_POST
+#define CLOG4(c, p, f, a1) _LOG_PRE(_LOGV(c), p, f), a1 _LOG_POST
+#define CTRACE3(c, f, a1) CLOG4(c, LP_TRACE, f, a1)
+#define CDEBUG3(c, f, a1) CLOG4(c, LP_DEBUG, f, a1)
+#define CINFO3(c, f, a1) CLOG4(c, LP_INFO, f, a1)
+#define CNOTICE3(c, f, a1) CLOG4(c, LP_NOTICE, f, a1)
+#define CWARNING3(c, f, a1) CLOG4(c, LP_WARNING, f, a1)
+#define CERROR3(c, f, a1) CLOG4(c, LP_ERROR, f, a1)
+#define CCRITICAL3(c, f, a1) CLOG4(c, LP_CRITICAL, f, a1)
+#define CALERT3(c, f, a1) CLOG4(c, LP_ALERT, f, a1)
+#define CEMERGENCY3(c, f, a1) CLOG4(c, LP_EMERGENCY, f, a1)
+#define LOG3(p, f, a1) _LOG_PRE(*_log_defaultCategory, p, f), a1 _LOG_POST
+#define INFO2(f, a1) _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1 _LOG_POST
+#define NOTICE2(f, a1)                                                         \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1 _LOG_POST
+#define TRACE2(f, a1) _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1 _LOG_POST
+#define DEBUG2(f, a1) _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1 _LOG_POST
+#define WARNING2(f, a1)                                                        \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1 _LOG_POST
+#define ERROR2(f, a1) _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1 _LOG_POST
+#define CRITICAL2(f, a1)                                                       \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1 _LOG_POST
+#define ALERT2(f, a1) _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1 _LOG_POST
+#define EMERGENCY2(f, a1)                                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1 _LOG_POST
 // Many repetitions follow...
-#define CLOG5(c, p, f,a1,a2) _LOG_PRE(_LOGV(c),p,f) ,a1,a2 _LOG_POST
-#define CTRACE4(c, f,a1,a2) CLOG5(c, LP_TRACE, f,a1,a2)
-#define CDEBUG4(c, f,a1,a2) CLOG5(c, LP_DEBUG, f,a1,a2)
-#define CINFO4(c, f,a1,a2) CLOG5(c, LP_INFO, f,a1,a2)
-#define CNOTICE4(c, f,a1,a2) CLOG5(c, LP_NOTICE, f,a1,a2)
-#define CWARNING4(c, f,a1,a2) CLOG5(c, LP_WARNING, f,a1,a2)
-#define CERROR4(c, f,a1,a2) CLOG5(c, LP_ERROR, f,a1,a2)
-#define CCRITICAL4(c, f,a1,a2) CLOG5(c, LP_CRITICAL, f,a1,a2)
-#define CALERT4(c, f,a1,a2) CLOG5(c, LP_ALERT, f,a1,a2)
-#define CEMERGENCY4(c, f,a1,a2) CLOG5(c, LP_EMERGENCY, f,a1,a2)
-#define LOG4(p, f,a1,a2)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1,a2 _LOG_POST
-#define INFO3(f,a1,a2)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1,a2 _LOG_POST
-#define NOTICE3(f,a1,a2)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1,a2 _LOG_POST
-#define TRACE3(f,a1,a2)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1,a2 _LOG_POST
-#define DEBUG3(f,a1,a2)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1,a2 _LOG_POST
-#define WARNING3(f,a1,a2)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1,a2 _LOG_POST
-#define ERROR3(f,a1,a2)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1,a2 _LOG_POST
-#define CRITICAL3(f,a1,a2)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1,a2 _LOG_POST
-#define ALERT3(f,a1,a2)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1,a2 _LOG_POST
-#define EMERGENCY3(f,a1,a2) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1,a2  _LOG_POST
+#define CLOG5(c, p, f, a1, a2) _LOG_PRE(_LOGV(c), p, f), a1, a2 _LOG_POST
+#define CTRACE4(c, f, a1, a2) CLOG5(c, LP_TRACE, f, a1, a2)
+#define CDEBUG4(c, f, a1, a2) CLOG5(c, LP_DEBUG, f, a1, a2)
+#define CINFO4(c, f, a1, a2) CLOG5(c, LP_INFO, f, a1, a2)
+#define CNOTICE4(c, f, a1, a2) CLOG5(c, LP_NOTICE, f, a1, a2)
+#define CWARNING4(c, f, a1, a2) CLOG5(c, LP_WARNING, f, a1, a2)
+#define CERROR4(c, f, a1, a2) CLOG5(c, LP_ERROR, f, a1, a2)
+#define CCRITICAL4(c, f, a1, a2) CLOG5(c, LP_CRITICAL, f, a1, a2)
+#define CALERT4(c, f, a1, a2) CLOG5(c, LP_ALERT, f, a1, a2)
+#define CEMERGENCY4(c, f, a1, a2) CLOG5(c, LP_EMERGENCY, f, a1, a2)
+#define LOG4(p, f, a1, a2)                                                     \
+    _LOG_PRE(*_log_defaultCategory, p, f), a1, a2 _LOG_POST
+#define INFO3(f, a1, a2)                                                       \
+    _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1, a2 _LOG_POST
+#define NOTICE3(f, a1, a2)                                                     \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1, a2 _LOG_POST
+#define TRACE3(f, a1, a2)                                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1, a2 _LOG_POST
+#define DEBUG3(f, a1, a2)                                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1, a2 _LOG_POST
+#define WARNING3(f, a1, a2)                                                    \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1, a2 _LOG_POST
+#define ERROR3(f, a1, a2)                                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1, a2 _LOG_POST
+#define CRITICAL3(f, a1, a2)                                                   \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1, a2 _LOG_POST
+#define ALERT3(f, a1, a2)                                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1, a2 _LOG_POST
+#define EMERGENCY3(f, a1, a2)                                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1, a2 _LOG_POST
 // Many repetitions follow...
-#define CLOG6(c, p, f,a1,a2,a3) _LOG_PRE(_LOGV(c),p,f) ,a1,a2,a3 _LOG_POST
-#define CTRACE5(c, f,a1,a2,a3) CLOG6(c, LP_TRACE, f,a1,a2,a3)
-#define CDEBUG5(c, f,a1,a2,a3) CLOG6(c, LP_DEBUG, f,a1,a2,a3)
-#define CINFO5(c, f,a1,a2,a3) CLOG6(c, LP_INFO, f,a1,a2,a3)
-#define CNOTICE5(c, f,a1,a2,a3) CLOG6(c, LP_NOTICE, f,a1,a2,a3)
-#define CWARNING5(c, f,a1,a2,a3) CLOG6(c, LP_WARNING, f,a1,a2,a3)
-#define CERROR5(c, f,a1,a2,a3) CLOG6(c, LP_ERROR, f,a1,a2,a3)
-#define CCRITICAL5(c, f,a1,a2,a3) CLOG6(c, LP_CRITICAL, f,a1,a2,a3)
-#define CALERT5(c, f,a1,a2,a3) CLOG6(c, LP_ALERT, f,a1,a2,a3)
-#define CEMERGENCY5(c, f,a1,a2,a3) CLOG6(c, LP_EMERGENCY, f,a1,a2,a3)
-#define LOG5(p, f,a1,a2,a3)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1,a2,a3 _LOG_POST
-#define INFO4(f,a1,a2,a3)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1,a2,a3 _LOG_POST
-#define NOTICE4(f,a1,a2,a3)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1,a2,a3 _LOG_POST
-#define TRACE4(f,a1,a2,a3)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1,a2,a3 _LOG_POST
-#define DEBUG4(f,a1,a2,a3)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1,a2,a3 _LOG_POST
-#define WARNING4(f,a1,a2,a3)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1,a2,a3 _LOG_POST
-#define ERROR4(f,a1,a2,a3)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1,a2,a3 _LOG_POST
-#define CRITICAL4(f,a1,a2,a3)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1,a2,a3 _LOG_POST
-#define ALERT4(f,a1,a2,a3)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1,a2,a3 _LOG_POST
-#define EMERGENCY4(f,a1,a2,a3) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1,a2,a3  _LOG_POST
+#define CLOG6(c, p, f, a1, a2, a3)                                             \
+    _LOG_PRE(_LOGV(c), p, f), a1, a2, a3 _LOG_POST
+#define CTRACE5(c, f, a1, a2, a3) CLOG6(c, LP_TRACE, f, a1, a2, a3)
+#define CDEBUG5(c, f, a1, a2, a3) CLOG6(c, LP_DEBUG, f, a1, a2, a3)
+#define CINFO5(c, f, a1, a2, a3) CLOG6(c, LP_INFO, f, a1, a2, a3)
+#define CNOTICE5(c, f, a1, a2, a3) CLOG6(c, LP_NOTICE, f, a1, a2, a3)
+#define CWARNING5(c, f, a1, a2, a3) CLOG6(c, LP_WARNING, f, a1, a2, a3)
+#define CERROR5(c, f, a1, a2, a3) CLOG6(c, LP_ERROR, f, a1, a2, a3)
+#define CCRITICAL5(c, f, a1, a2, a3) CLOG6(c, LP_CRITICAL, f, a1, a2, a3)
+#define CALERT5(c, f, a1, a2, a3) CLOG6(c, LP_ALERT, f, a1, a2, a3)
+#define CEMERGENCY5(c, f, a1, a2, a3) CLOG6(c, LP_EMERGENCY, f, a1, a2, a3)
+#define LOG5(p, f, a1, a2, a3)                                                 \
+    _LOG_PRE(*_log_defaultCategory, p, f), a1, a2, a3 _LOG_POST
+#define INFO4(f, a1, a2, a3)                                                   \
+    _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1, a2, a3 _LOG_POST
+#define NOTICE4(f, a1, a2, a3)                                                 \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1, a2, a3 _LOG_POST
+#define TRACE4(f, a1, a2, a3)                                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1, a2, a3 _LOG_POST
+#define DEBUG4(f, a1, a2, a3)                                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1, a2, a3 _LOG_POST
+#define WARNING4(f, a1, a2, a3)                                                \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1, a2, a3 _LOG_POST
+#define ERROR4(f, a1, a2, a3)                                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1, a2, a3 _LOG_POST
+#define CRITICAL4(f, a1, a2, a3)                                               \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1, a2, a3 _LOG_POST
+#define ALERT4(f, a1, a2, a3)                                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1, a2, a3 _LOG_POST
+#define EMERGENCY4(f, a1, a2, a3)                                              \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1, a2, a3 _LOG_POST
 // Many repetitions follow...
-#define CLOG7(c, p, f,a1,a2,a3,a4) _LOG_PRE(_LOGV(c),p,f) ,a1,a2,a3,a4 _LOG_POST
-#define CTRACE6(c, f,a1,a2,a3,a4) CLOG7(c, LP_TRACE, f,a1,a2,a3,a4)
-#define CDEBUG6(c, f,a1,a2,a3,a4) CLOG7(c, LP_DEBUG, f,a1,a2,a3,a4)
-#define CINFO6(c, f,a1,a2,a3,a4) CLOG7(c, LP_INFO, f,a1,a2,a3,a4)
-#define CNOTICE6(c, f,a1,a2,a3,a4) CLOG7(c, LP_NOTICE, f,a1,a2,a3,a4)
-#define CWARNING6(c, f,a1,a2,a3,a4) CLOG7(c, LP_WARNING, f,a1,a2,a3,a4)
-#define CERROR6(c, f,a1,a2,a3,a4) CLOG7(c, LP_ERROR, f,a1,a2,a3,a4)
-#define CCRITICAL6(c, f,a1,a2,a3,a4) CLOG7(c, LP_CRITICAL, f,a1,a2,a3,a4)
-#define CALERT6(c, f,a1,a2,a3,a4) CLOG7(c, LP_ALERT, f,a1,a2,a3,a4)
-#define CEMERGENCY6(c, f,a1,a2,a3,a4) CLOG7(c, LP_EMERGENCY, f,a1,a2,a3,a4)
-#define LOG6(p, f,a1,a2,a3,a4)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1,a2,a3,a4 _LOG_POST
-#define INFO5(f,a1,a2,a3,a4)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1,a2,a3,a4 _LOG_POST
-#define NOTICE5(f,a1,a2,a3,a4)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1,a2,a3,a4 _LOG_POST
-#define TRACE5(f,a1,a2,a3,a4)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1,a2,a3,a4 _LOG_POST
-#define DEBUG5(f,a1,a2,a3,a4)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1,a2,a3,a4 _LOG_POST
-#define WARNING5(f,a1,a2,a3,a4)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1,a2,a3,a4 _LOG_POST
-#define ERROR5(f,a1,a2,a3,a4)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1,a2,a3,a4 _LOG_POST
-#define CRITICAL5(f,a1,a2,a3,a4)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1,a2,a3,a4 _LOG_POST
-#define ALERT5(f,a1,a2,a3,a4)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1,a2,a3,a4 _LOG_POST
-#define EMERGENCY5(f,a1,a2,a3,a4) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1,a2,a3,a4  _LOG_POST
+#define CLOG7(c, p, f, a1, a2, a3, a4)                                         \
+    _LOG_PRE(_LOGV(c), p, f), a1, a2, a3, a4 _LOG_POST
+#define CTRACE6(c, f, a1, a2, a3, a4) CLOG7(c, LP_TRACE, f, a1, a2, a3, a4)
+#define CDEBUG6(c, f, a1, a2, a3, a4) CLOG7(c, LP_DEBUG, f, a1, a2, a3, a4)
+#define CINFO6(c, f, a1, a2, a3, a4) CLOG7(c, LP_INFO, f, a1, a2, a3, a4)
+#define CNOTICE6(c, f, a1, a2, a3, a4) CLOG7(c, LP_NOTICE, f, a1, a2, a3, a4)
+#define CWARNING6(c, f, a1, a2, a3, a4) CLOG7(c, LP_WARNING, f, a1, a2, a3, a4)
+#define CERROR6(c, f, a1, a2, a3, a4) CLOG7(c, LP_ERROR, f, a1, a2, a3, a4)
+#define CCRITICAL6(c, f, a1, a2, a3, a4)                                       \
+    CLOG7(c, LP_CRITICAL, f, a1, a2, a3, a4)
+#define CALERT6(c, f, a1, a2, a3, a4) CLOG7(c, LP_ALERT, f, a1, a2, a3, a4)
+#define CEMERGENCY6(c, f, a1, a2, a3, a4)                                      \
+    CLOG7(c, LP_EMERGENCY, f, a1, a2, a3, a4)
+#define LOG6(p, f, a1, a2, a3, a4)                                             \
+    _LOG_PRE(*_log_defaultCategory, p, f), a1, a2, a3, a4 _LOG_POST
+#define INFO5(f, a1, a2, a3, a4)                                               \
+    _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1, a2, a3, a4 _LOG_POST
+#define NOTICE5(f, a1, a2, a3, a4)                                             \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1, a2, a3, a4 _LOG_POST
+#define TRACE5(f, a1, a2, a3, a4)                                              \
+    _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1, a2, a3, a4 _LOG_POST
+#define DEBUG5(f, a1, a2, a3, a4)                                              \
+    _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1, a2, a3, a4 _LOG_POST
+#define WARNING5(f, a1, a2, a3, a4)                                            \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1, a2, a3, a4 _LOG_POST
+#define ERROR5(f, a1, a2, a3, a4)                                              \
+    _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1, a2, a3, a4 _LOG_POST
+#define CRITICAL5(f, a1, a2, a3, a4)                                           \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1, a2, a3, a4 _LOG_POST
+#define ALERT5(f, a1, a2, a3, a4)                                              \
+    _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1, a2, a3, a4 _LOG_POST
+#define EMERGENCY5(f, a1, a2, a3, a4)                                          \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1, a2, a3, a4 _LOG_POST
 // Many repetitions follow...
-#define CLOG8(c, p, f,a1,a2,a3,a4,a5) _LOG_PRE(_LOGV(c),p,f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define CTRACE7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_TRACE, f,a1,a2,a3,a4,a5)
-#define CDEBUG7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_DEBUG, f,a1,a2,a3,a4,a5)
-#define CINFO7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_INFO, f,a1,a2,a3,a4,a5)
-#define CNOTICE7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_NOTICE, f,a1,a2,a3,a4,a5)
-#define CWARNING7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_WARNING, f,a1,a2,a3,a4,a5)
-#define CERROR7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_ERROR, f,a1,a2,a3,a4,a5)
-#define CCRITICAL7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_CRITICAL, f,a1,a2,a3,a4,a5)
-#define CALERT7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_ALERT, f,a1,a2,a3,a4,a5)
-#define CEMERGENCY7(c, f,a1,a2,a3,a4,a5) CLOG8(c, LP_EMERGENCY, f,a1,a2,a3,a4,a5)
-#define LOG7(p, f,a1,a2,a3,a4,a5)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define INFO6(f,a1,a2,a3,a4,a5)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define NOTICE6(f,a1,a2,a3,a4,a5)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define TRACE6(f,a1,a2,a3,a4,a5)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define DEBUG6(f,a1,a2,a3,a4,a5)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define WARNING6(f,a1,a2,a3,a4,a5)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define ERROR6(f,a1,a2,a3,a4,a5)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define CRITICAL6(f,a1,a2,a3,a4,a5)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define ALERT6(f,a1,a2,a3,a4,a5)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1,a2,a3,a4,a5 _LOG_POST
-#define EMERGENCY6(f,a1,a2,a3,a4,a5) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1,a2,a3,a4,a5  _LOG_POST
+#define CLOG8(c, p, f, a1, a2, a3, a4, a5)                                     \
+    _LOG_PRE(_LOGV(c), p, f), a1, a2, a3, a4, a5 _LOG_POST
+#define CTRACE7(c, f, a1, a2, a3, a4, a5)                                      \
+    CLOG8(c, LP_TRACE, f, a1, a2, a3, a4, a5)
+#define CDEBUG7(c, f, a1, a2, a3, a4, a5)                                      \
+    CLOG8(c, LP_DEBUG, f, a1, a2, a3, a4, a5)
+#define CINFO7(c, f, a1, a2, a3, a4, a5)                                       \
+    CLOG8(c, LP_INFO, f, a1, a2, a3, a4, a5)
+#define CNOTICE7(c, f, a1, a2, a3, a4, a5)                                     \
+    CLOG8(c, LP_NOTICE, f, a1, a2, a3, a4, a5)
+#define CWARNING7(c, f, a1, a2, a3, a4, a5)                                    \
+    CLOG8(c, LP_WARNING, f, a1, a2, a3, a4, a5)
+#define CERROR7(c, f, a1, a2, a3, a4, a5)                                      \
+    CLOG8(c, LP_ERROR, f, a1, a2, a3, a4, a5)
+#define CCRITICAL7(c, f, a1, a2, a3, a4, a5)                                   \
+    CLOG8(c, LP_CRITICAL, f, a1, a2, a3, a4, a5)
+#define CALERT7(c, f, a1, a2, a3, a4, a5)                                      \
+    CLOG8(c, LP_ALERT, f, a1, a2, a3, a4, a5)
+#define CEMERGENCY7(c, f, a1, a2, a3, a4, a5)                                  \
+    CLOG8(c, LP_EMERGENCY, f, a1, a2, a3, a4, a5)
+#define LOG7(p, f, a1, a2, a3, a4, a5)                                         \
+    _LOG_PRE(*_log_defaultCategory, p, f), a1, a2, a3, a4, a5 _LOG_POST
+#define INFO6(f, a1, a2, a3, a4, a5)                                           \
+    _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1, a2, a3, a4, a5 _LOG_POST
+#define NOTICE6(f, a1, a2, a3, a4, a5)                                         \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1, a2, a3, a4, a5 _LOG_POST
+#define TRACE6(f, a1, a2, a3, a4, a5)                                          \
+    _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1, a2, a3, a4, a5 _LOG_POST
+#define DEBUG6(f, a1, a2, a3, a4, a5)                                          \
+    _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1, a2, a3, a4, a5 _LOG_POST
+#define WARNING6(f, a1, a2, a3, a4, a5)                                        \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1, a2, a3, a4, a5 _LOG_POST
+#define ERROR6(f, a1, a2, a3, a4, a5)                                          \
+    _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1, a2, a3, a4, a5 _LOG_POST
+#define CRITICAL6(f, a1, a2, a3, a4, a5)                                       \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1, a2, a3, a4,           \
+        a5 _LOG_POST
+#define ALERT6(f, a1, a2, a3, a4, a5)                                          \
+    _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1, a2, a3, a4, a5 _LOG_POST
+#define EMERGENCY6(f, a1, a2, a3, a4, a5)                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1, a2, a3, a4,          \
+        a5 _LOG_POST
 // Many repetitions follow...
-#define CLOG9(c, p, f,a1,a2,a3,a4,a5,a6) _LOG_PRE(_LOGV(c),p,f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define CTRACE8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_TRACE, f,a1,a2,a3,a4,a5,a6)
-#define CDEBUG8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_DEBUG, f,a1,a2,a3,a4,a5,a6)
-#define CINFO8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_INFO, f,a1,a2,a3,a4,a5,a6)
-#define CNOTICE8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_NOTICE, f,a1,a2,a3,a4,a5,a6)
-#define CWARNING8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_WARNING, f,a1,a2,a3,a4,a5,a6)
-#define CERROR8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_ERROR, f,a1,a2,a3,a4,a5,a6)
-#define CCRITICAL8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_CRITICAL, f,a1,a2,a3,a4,a5,a6)
-#define CALERT8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_ALERT, f,a1,a2,a3,a4,a5,a6)
-#define CEMERGENCY8(c, f,a1,a2,a3,a4,a5,a6) CLOG9(c, LP_EMERGENCY, f,a1,a2,a3,a4,a5,a6)
-#define LOG8(p, f,a1,a2,a3,a4,a5,a6)    _LOG_PRE(*_log_defaultCategory, p, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define INFO7(f,a1,a2,a3,a4,a5,a6)      _LOG_PRE(*_log_defaultCategory, LP_INFO, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define NOTICE7(f,a1,a2,a3,a4,a5,a6)    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define TRACE7(f,a1,a2,a3,a4,a5,a6)     _LOG_PRE(*_log_defaultCategory, LP_TRACE, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define DEBUG7(f,a1,a2,a3,a4,a5,a6)     _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define WARNING7(f,a1,a2,a3,a4,a5,a6)   _LOG_PRE(*_log_defaultCategory, LP_WARNING, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define ERROR7(f,a1,a2,a3,a4,a5,a6)     _LOG_PRE(*_log_defaultCategory, LP_ERROR, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define CRITICAL7(f,a1,a2,a3,a4,a5,a6)  _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define ALERT7(f,a1,a2,a3,a4,a5,a6)     _LOG_PRE(*_log_defaultCategory, LP_ALERT, f) ,a1,a2,a3,a4,a5,a6 _LOG_POST
-#define EMERGENCY7(f,a1,a2,a3,a4,a5,a6) _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f) ,a1,a2,a3,a4,a5,a6  _LOG_POST
+#define CLOG9(c, p, f, a1, a2, a3, a4, a5, a6)                                 \
+    _LOG_PRE(_LOGV(c), p, f), a1, a2, a3, a4, a5, a6 _LOG_POST
+#define CTRACE8(c, f, a1, a2, a3, a4, a5, a6)                                  \
+    CLOG9(c, LP_TRACE, f, a1, a2, a3, a4, a5, a6)
+#define CDEBUG8(c, f, a1, a2, a3, a4, a5, a6)                                  \
+    CLOG9(c, LP_DEBUG, f, a1, a2, a3, a4, a5, a6)
+#define CINFO8(c, f, a1, a2, a3, a4, a5, a6)                                   \
+    CLOG9(c, LP_INFO, f, a1, a2, a3, a4, a5, a6)
+#define CNOTICE8(c, f, a1, a2, a3, a4, a5, a6)                                 \
+    CLOG9(c, LP_NOTICE, f, a1, a2, a3, a4, a5, a6)
+#define CWARNING8(c, f, a1, a2, a3, a4, a5, a6)                                \
+    CLOG9(c, LP_WARNING, f, a1, a2, a3, a4, a5, a6)
+#define CERROR8(c, f, a1, a2, a3, a4, a5, a6)                                  \
+    CLOG9(c, LP_ERROR, f, a1, a2, a3, a4, a5, a6)
+#define CCRITICAL8(c, f, a1, a2, a3, a4, a5, a6)                               \
+    CLOG9(c, LP_CRITICAL, f, a1, a2, a3, a4, a5, a6)
+#define CALERT8(c, f, a1, a2, a3, a4, a5, a6)                                  \
+    CLOG9(c, LP_ALERT, f, a1, a2, a3, a4, a5, a6)
+#define CEMERGENCY8(c, f, a1, a2, a3, a4, a5, a6)                              \
+    CLOG9(c, LP_EMERGENCY, f, a1, a2, a3, a4, a5, a6)
+#define LOG8(p, f, a1, a2, a3, a4, a5, a6)                                     \
+    _LOG_PRE(*_log_defaultCategory, p, f), a1, a2, a3, a4, a5, a6 _LOG_POST
+#define INFO7(f, a1, a2, a3, a4, a5, a6)                                       \
+    _LOG_PRE(*_log_defaultCategory, LP_INFO, f), a1, a2, a3, a4, a5,           \
+        a6 _LOG_POST
+#define NOTICE7(f, a1, a2, a3, a4, a5, a6)                                     \
+    _LOG_PRE(*_log_defaultCategory, LP_NOTICE, f), a1, a2, a3, a4, a5,         \
+        a6 _LOG_POST
+#define TRACE7(f, a1, a2, a3, a4, a5, a6)                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_TRACE, f), a1, a2, a3, a4, a5,          \
+        a6 _LOG_POST
+#define DEBUG7(f, a1, a2, a3, a4, a5, a6)                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_DEBUG, f), a1, a2, a3, a4, a5,          \
+        a6 _LOG_POST
+#define WARNING7(f, a1, a2, a3, a4, a5, a6)                                    \
+    _LOG_PRE(*_log_defaultCategory, LP_WARNING, f), a1, a2, a3, a4, a5,        \
+        a6 _LOG_POST
+#define ERROR7(f, a1, a2, a3, a4, a5, a6)                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_ERROR, f), a1, a2, a3, a4, a5,          \
+        a6 _LOG_POST
+#define CRITICAL7(f, a1, a2, a3, a4, a5, a6)                                   \
+    _LOG_PRE(*_log_defaultCategory, LP_CRITICAL, f), a1, a2, a3, a4, a5,       \
+        a6 _LOG_POST
+#define ALERT7(f, a1, a2, a3, a4, a5, a6)                                      \
+    _LOG_PRE(*_log_defaultCategory, LP_ALERT, f), a1, a2, a3, a4, a5,          \
+        a6 _LOG_POST
+#define EMERGENCY7(f, a1, a2, a3, a4, a5, a6)                                  \
+    _LOG_PRE(*_log_defaultCategory, LP_EMERGENCY, f), a1, a2, a3, a4, a5,      \
+        a6 _LOG_POST
 //@}
 #endif // _LOG4C_H_

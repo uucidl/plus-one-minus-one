@@ -1,6 +1,5 @@
 
 
-
-# recurse
-TOP:=../$(TOP)
-include $(TOP)/config.mk
+#recurse
+TOP:
+=../ $(TOP) include $(TOP) / config.mk

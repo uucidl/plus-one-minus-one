@@ -2,17 +2,15 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/system/pan.h') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 166 */
 
-
-
 #ifndef PAN_H
-  #define PAN_H
+#define PAN_H
 
 #include <system/demo.h>
 #include <system/audio_effect.h>
@@ -20,7 +18,7 @@
 /*
   open a playback device
 */
-int pan_open(const char* driver, const char* device, int sample_rate);
+int pan_open(const char *driver, const char *device, int sample_rate);
 
 /*
   start device
@@ -60,7 +58,7 @@ int pan_is_ready();
 /*
   update the device with the provided buffer
 */
-void pan_update(sample_t* samples);
+void pan_update(sample_t *samples);
 
 /*
   return the current number of milliseconds
@@ -70,6 +68,6 @@ double pan_gettime();
 /*
   cohfigure demo object
 */
-int pan_configure_demo(demo_t* demo);
+int pan_configure_demo(demo_t *demo);
 
 #endif

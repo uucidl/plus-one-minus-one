@@ -1,15 +1,14 @@
 /* a10 829
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
- * You should have received this file ('src/system/video_to_opengl_frame_converter.h') with a license
- * agreement. ('LICENSE' file) 
+ * You should have received this file
+ *('src/system/video_to_opengl_frame_converter.h') with a license
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 829 */
-
-
 
 #ifndef KNOS_DEMOS_SYSTEM_VIDEO_TO_OPENGL_FRAME_CONVERTER_H
 #define KNOS_DEMOS_SYSTEM_VIDEO_TO_OPENGL_FRAME_CONVERTER_H
@@ -20,11 +19,11 @@
 
 typedef enum { BILINEAR_FILTER, POINT_FILTER } pixel_filter_type_t;
 
-typedef struct video_to_opengl_frame_converter_t
-{
+typedef struct video_to_opengl_frame_converter_t {
     frame_converter_t super;
 
-    void (*activate_filter) (struct video_to_opengl_frame_converter_t* self, pixel_filter_type_t filter);
+    void (*activate_filter)(struct video_to_opengl_frame_converter_t *self,
+                            pixel_filter_type_t filter);
 
     int width;
     int height;
@@ -32,9 +31,9 @@ typedef struct video_to_opengl_frame_converter_t
 
     int activate_bilinear_filter_p;
 
-    uint32_t*     framebuffer; /* framebuffer texture */
-    uint32_t*     buffer;      /* temporary buffer */
-    GLuint        texture_id;
+    uint32_t *framebuffer; /* framebuffer texture */
+    uint32_t *buffer;      /* temporary buffer */
+    GLuint texture_id;
 
     int tex_width;
     int tex_height;

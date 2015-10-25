@@ -2,15 +2,12 @@
  * Copyright (c) 2001-2012 Nicolas Léveillé <knos.free.fr>
  *
  * You should have received this file ('src/image_load_jpeg.c') with a license
- * agreement. ('LICENSE' file) 
+ * agreement. ('LICENSE' file)
  *
  * Copying, using, modifying and distributing this file are rights
  * covered under this licensing agreement and are conditioned by its
  * full acceptance and understanding.
  * e 743 */
-
-
-
 
 #include "image_load_jpeg.h"
 
@@ -33,12 +30,12 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_LOAD_JPEG);
 typedef struct {
     struct jpeg_source_mgr pub;
 
-    stream_t* stream;
-    JOCTET* buffer;
+    stream_t *stream;
+    JOCTET *buffer;
     char start_of_file_p;
 } stream_source_mgr;
 
-#define INPUT_BUF_SIZE  4096	/* choose an efficiently fread'able size */
+#define INPUT_BUF_SIZE 4096 /* choose an efficiently fread'able size */
 
 /*
  * Initialize source --- called by jpeg_read_header
@@ -46,9 +43,9 @@ typedef struct {
  */
 
 METHODDEF(void)
-init_source (j_decompress_ptr cinfo)
+init_source(j_decompress_ptr cinfo)
 {
-    stream_source_mgr* src = (stream_source_mgr*) cinfo->src;
+    stream_source_mgr *src = (stream_source_mgr *)cinfo->src;
 
     /* We reset the empty-input-file flag for each image,
      * but we don't clear the input buffer.
@@ -91,30 +88,30 @@ init_source (j_decompress_ptr cinfo)
  */
 
 METHODDEF(boolean)
-fill_input_buffer (j_decompress_ptr cinfo)
+fill_input_buffer(j_decompress_ptr cinfo)
 {
-    stream_source_mgr* src = (stream_source_mgr*) cinfo->src;
+    stream_source_mgr *src = (stream_source_mgr *)cinfo->src;
     size_t nbytes;
 
     nbytes = stream_get_callbacks(src->stream)
-      ->read(src->buffer, 1, INPUT_BUF_SIZE, src->stream);
+                 ->read(src->buffer, 1, INPUT_BUF_SIZE, src->stream);
 
     if (nbytes <= 0) {
-	/* original: Treat empty input file as fatal error
-	if (src->start_of_file_p)
-	    ERREXIT(cinfo, JERR_INPUT_EMPTY);
-	*/
-	ERREXIT(cinfo, JERR_INPUT_EOF);
-	WARNMS(cinfo, JWRN_JPEG_EOF);
-	/* Insert a fake EOI marker */
-	src->buffer[0] = (JOCTET) 0xFF;
-	src->buffer[1] = (JOCTET) JPEG_EOI;
-	nbytes = 2;
+        /* original: Treat empty input file as fatal error
+        if (src->start_of_file_p)
+            ERREXIT(cinfo, JERR_INPUT_EMPTY);
+        */
+        ERREXIT(cinfo, JERR_INPUT_EOF);
+        WARNMS(cinfo, JWRN_JPEG_EOF);
+        /* Insert a fake EOI marker */
+        src->buffer[0] = (JOCTET)0xFF;
+        src->buffer[1] = (JOCTET)JPEG_EOI;
+        nbytes = 2;
     }
 
     src->pub.next_input_byte = src->buffer;
     src->pub.bytes_in_buffer = nbytes;
-    src->start_of_file_p     = FALSE;
+    src->start_of_file_p = FALSE;
 
     return TRUE;
 }
@@ -132,24 +129,24 @@ fill_input_buffer (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-skip_input_data (j_decompress_ptr cinfo, long num_bytes)
+skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
-    stream_source_mgr* src = (stream_source_mgr*) cinfo->src;
+    stream_source_mgr *src = (stream_source_mgr *)cinfo->src;
 
     /* Just a dumb implementation for now.  Could use fseek() except
      * it doesn't work on pipes.  Not clear that being smart is worth
      * any trouble anyway --- large skips are infrequent.
      */
     if (num_bytes > 0) {
-	while (num_bytes > (long) src->pub.bytes_in_buffer) {
-	    num_bytes -= (long) src->pub.bytes_in_buffer;
-	    (void) fill_input_buffer(cinfo);
-	    /* note we assume that fill_input_buffer will never return FALSE,
-	     * so suspension need not be handled.
-	     */
-	}
-	src->pub.next_input_byte += (size_t) num_bytes;
-	src->pub.bytes_in_buffer -= (size_t) num_bytes;
+        while (num_bytes > (long)src->pub.bytes_in_buffer) {
+            num_bytes -= (long)src->pub.bytes_in_buffer;
+            (void)fill_input_buffer(cinfo);
+            /* note we assume that fill_input_buffer will never return FALSE,
+             * so suspension need not be handled.
+             */
+        }
+        src->pub.next_input_byte += (size_t)num_bytes;
+        src->pub.bytes_in_buffer -= (size_t)num_bytes;
     }
 }
 
@@ -162,9 +159,7 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
  * for error exit.
  */
 METHODDEF(void)
-term_source (j_decompress_ptr cinfo) {
-    /* no work necessary here */
-}
+term_source(j_decompress_ptr cinfo) { /* no work necessary here */}
 
 /*
  * Prepare for input from a stream.
@@ -173,62 +168,61 @@ term_source (j_decompress_ptr cinfo) {
  */
 
 GLOBAL(void)
-jpeg_stream_src (j_decompress_ptr cinfo, stream_t* infile)
+jpeg_stream_src(j_decompress_ptr cinfo, stream_t *infile)
 {
-  stream_source_mgr* src;
+    stream_source_mgr *src;
 
-  /* The source object and input buffer are made permanent so that a series
-   * of JPEG images can be read from the same file by calling jpeg_stdio_src
-   * only before the first one.  (If we discarded the buffer at the end of
-   * one image, we'd likely lose the start of the next one.)
-   * This makes it unsafe to use this manager and a different source
-   * manager serially with the same JPEG object.  Caveat programmer.
-   */
-  if (cinfo->src == NULL) {	/* first time for this JPEG object? */
-      cinfo->src = (struct jpeg_source_mgr *)
-	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				      sizeof(stream_source_mgr));
-      src = (stream_source_mgr*) cinfo->src;
-      src->buffer = (JOCTET *)
-	  (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				      INPUT_BUF_SIZE * sizeof(JOCTET));
-  }
+    /* The source object and input buffer are made permanent so that a series
+     * of JPEG images can be read from the same file by calling jpeg_stdio_src
+     * only before the first one.  (If we discarded the buffer at the end of
+     * one image, we'd likely lose the start of the next one.)
+     * This makes it unsafe to use this manager and a different source
+     * manager serially with the same JPEG object.  Caveat programmer.
+     */
+    if (cinfo->src == NULL) { /* first time for this JPEG object? */
+        cinfo->src = (struct jpeg_source_mgr *)(*cinfo->mem->alloc_small)(
+            (j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(stream_source_mgr));
+        src = (stream_source_mgr *)cinfo->src;
+        src->buffer = (JOCTET *)(*cinfo->mem->alloc_small)(
+            (j_common_ptr)cinfo, JPOOL_PERMANENT,
+            INPUT_BUF_SIZE * sizeof(JOCTET));
+    }
 
-  src = (stream_source_mgr*) cinfo->src;
-  src->pub.init_source = init_source;
-  src->pub.fill_input_buffer = fill_input_buffer;
-  src->pub.skip_input_data = skip_input_data;
-  src->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
-  src->pub.term_source = term_source;
-  src->stream = infile;
-  src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
-  src->pub.next_input_byte = NULL; /* until buffer loaded */
+    src = (stream_source_mgr *)cinfo->src;
+    src->pub.init_source = init_source;
+    src->pub.fill_input_buffer = fill_input_buffer;
+    src->pub.skip_input_data = skip_input_data;
+    src->pub.resync_to_restart =
+        jpeg_resync_to_restart; /* use default method */
+    src->pub.term_source = term_source;
+    src->stream = infile;
+    src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
+    src->pub.next_input_byte = NULL; /* until buffer loaded */
 }
 
 typedef struct {
     struct jpeg_error_mgr super;
 
     jmp_buf env;
-    volatile image_t* im; // eventually, image to cleanup
+    volatile image_t *im; // eventually, image to cleanup
     volatile int image_is_owned_p;
 } myerror_mgr;
 
-static
-void image_load_jpeg_error_exit(j_common_ptr cinfo)
+static void image_load_jpeg_error_exit(j_common_ptr cinfo)
 {
-    struct jpeg_decompress_struct* c = (struct jpeg_decompress_struct*) cinfo ;
-    myerror_mgr* mgr = (myerror_mgr*) c->err;
+    struct jpeg_decompress_struct *c = (struct jpeg_decompress_struct *)cinfo;
+    myerror_mgr *mgr = (myerror_mgr *)c->err;
 
-    char buffer [JMSG_LENGTH_MAX];
-    (*cinfo->err->format_message) (cinfo, buffer);
+    char buffer[JMSG_LENGTH_MAX];
+    (*cinfo->err->format_message)(cinfo, buffer);
 
     // prints the error message.
-    printf ("error message: %s\n", buffer);
+    printf("error message: %s\n", buffer);
 
-    if(mgr->im) {
-	image_destroy((image_t*) mgr->im);
-	if(mgr->image_is_owned_p)
-	    free((void*) mgr->im);
+    if (mgr->im) {
+        image_destroy((image_t *)mgr->im);
+        if (mgr->image_is_owned_p)
+            free((void *)mgr->im);
     }
 
     ERROR1("jpeg load error.");
@@ -236,138 +230,129 @@ void image_load_jpeg_error_exit(j_common_ptr cinfo)
     longjmp(mgr->env, 1);
 }
 
-image_t* image_load_jpg(image_t* x, stream_t* stream)
+image_t *image_load_jpg(image_t *x, stream_t *stream)
 {
-  image_t* im;
+    image_t *im;
 
-  TRACE1 ("loading jpeg file");
+    TRACE1("loading jpeg file");
 
-  if (!stream) {
-    im = NULL;
-  } else {
-    int load;
-    im = image_instantiate_toplevel (x);
+    if (!stream) {
+        im = NULL;
+    } else {
+        int load;
+        im = image_instantiate_toplevel(x);
 
-    struct jpeg_decompress_struct cinfo;
-    myerror_mgr errmgr;
+        struct jpeg_decompress_struct cinfo;
+        myerror_mgr errmgr;
 
-    errmgr.im = im;
-    errmgr.image_is_owned_p = (im != x);
+        errmgr.im = im;
+        errmgr.image_is_owned_p = (im != x);
 
-    if (setjmp (errmgr.env)) {
-	    jpeg_destroy_decompress(&cinfo);
+        if (setjmp(errmgr.env)) {
+            jpeg_destroy_decompress(&cinfo);
 
-	// coming back from an error
-	return NULL;
-    }
+            // coming back from an error
+            return NULL;
+        }
 
-    /* insert here useless error test */
-    /* jpeg object initialisation */
-    jpeg_create_decompress (&cinfo);
+        /* insert here useless error test */
+        /* jpeg object initialisation */
+        jpeg_create_decompress(&cinfo);
 
-    /* specify data source */
-    jpeg_stream_src (&cinfo, stream);
+        /* specify data source */
+        jpeg_stream_src(&cinfo, stream);
 
-    /* standard error */
-    cinfo.err               = jpeg_std_error (&errmgr.super);
-    errmgr.super.error_exit = image_load_jpeg_error_exit;
+        /* standard error */
+        cinfo.err = jpeg_std_error(&errmgr.super);
+        errmgr.super.error_exit = image_load_jpeg_error_exit;
 
-    if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
-	    return NULL;
-    }
+        if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
+            return NULL;
+        }
 
-    if (jpeg_start_decompress(&cinfo) < 0) {
-	    return NULL;
-    }
+        if (jpeg_start_decompress(&cinfo) < 0) {
+            return NULL;
+        }
 
-    if (!cinfo.output_width || !cinfo.output_height) {
-	    WARNING1("null size image.");
-	    return NULL;
-    }
+        if (!cinfo.output_width || !cinfo.output_height) {
+            WARNING1("null size image.");
+            return NULL;
+        }
 
-    image_new(im,
-	      cinfo.output_width,
-	      cinfo.output_height,
-	      cinfo.output_width);
+        image_new(im, cinfo.output_width, cinfo.output_height,
+                  cinfo.output_width);
 
-    switch (cinfo.output_components) {
-    case 1: /* GRAY */
-	load = 1;
-	break;
-    case 3: // RGB
-	load = 1;
-	break;
-    default:
-	/* don't know how to load that */
-	image_destroy (im);
-	if(im != x) {
-		image_retire (im);
-	}
-	im = NULL;
+        switch (cinfo.output_components) {
+        case 1: /* GRAY */
+            load = 1;
+            break;
+        case 3: // RGB
+            load = 1;
+            break;
+        default:
+            /* don't know how to load that */
+            image_destroy(im);
+            if (im != x) {
+                image_retire(im);
+            }
+            im = NULL;
 
-	load = 0;
-    }
+            load = 0;
+        }
 
-    if (load) {
-	JSAMPARRAY scanline_buf;
+        if (load) {
+            JSAMPARRAY scanline_buf;
 
-	scanline_buf = (*cinfo.mem->alloc_sarray)
-		((j_common_ptr) &cinfo, JPOOL_IMAGE,
-		 cinfo.output_width *
-		 cinfo.output_components,
-		 cinfo.rec_outbuf_height);
+            scanline_buf = (*cinfo.mem->alloc_sarray)(
+                (j_common_ptr)&cinfo, JPOOL_IMAGE,
+                cinfo.output_width * cinfo.output_components,
+                cinfo.rec_outbuf_height);
 
-	while (cinfo.output_scanline < cinfo.output_height) {
-	    int n;
+            while (cinfo.output_scanline < cinfo.output_height) {
+                int n;
 
-	    uint32_t* dest = im->pixels + im->pitch * cinfo.output_scanline;
+                uint32_t *dest = im->pixels + im->pitch * cinfo.output_scanline;
 
-	    n = jpeg_read_scanlines(&cinfo,
-				    scanline_buf,
-				    cinfo.rec_outbuf_height);
+                n = jpeg_read_scanlines(&cinfo, scanline_buf,
+                                        cinfo.rec_outbuf_height);
 
-	    int s;
-	    for (s = 0; s < n; s++) {
-		    unsigned char* scanline = scanline_buf [s];
+                int s;
+                for (s = 0; s < n; s++) {
+                    unsigned char *scanline = scanline_buf[s];
 
-		    /* copy to image */
-		    int i;
-		    for (i = 0; i < im->width; i++) {
-			    if(cinfo.output_components == 1) {
-				    dest[i] = 0xff000000 |
-					    (scanline[i] << 16) |
-					    (scanline[i] << 8) |
-					    (scanline[i]);
-			    } else if(cinfo.output_components == 3) {
-#if (BYTE_ORDER == LITTLE_ENDIAN && defined (PIXEL_RGBA8888)) ||	\
-	(BYTE_ORDER == BIG_ENDIAN && defined (PIXEL_BGRA8888))
-				    dest[i] =
-					    0xff000000 |
-					    (scanline [3*i + 0] << 16) |
-					    (scanline [3*i + 1] << 8) |
-					    (scanline [3*i + 2] << 0);
+                    /* copy to image */
+                    int i;
+                    for (i = 0; i < im->width; i++) {
+                        if (cinfo.output_components == 1) {
+                            dest[i] = 0xff000000 | (scanline[i] << 16) |
+                                      (scanline[i] << 8) | (scanline[i]);
+                        } else if (cinfo.output_components == 3) {
+#if (BYTE_ORDER == LITTLE_ENDIAN && defined(PIXEL_RGBA8888)) ||                \
+    (BYTE_ORDER == BIG_ENDIAN && defined(PIXEL_BGRA8888))
+                            dest[i] = 0xff000000 | (scanline[3 * i + 0] << 16) |
+                                      (scanline[3 * i + 1] << 8) |
+                                      (scanline[3 * i + 2] << 0);
 #else
-				    /*dest[i] = 0xff000000 | //alpha
-					    (scanline [3*i + 2] << 0) |
-					    (scanline [3*i + 1] << 8) |
-					    (scanline [3*i + 2] << 16);
-				    */
-				    dest[i] = 0xff000000 | // alpha
-					    (scanline [3 * i + 0] << 0) | // r
-					    (scanline [3 * i + 1] << 8) | // g
-					    (scanline [3 * i + 2] << 16); // b
+                            /*dest[i] = 0xff000000 | //alpha
+                                    (scanline [3*i + 2] << 0) |
+                                    (scanline [3*i + 1] << 8) |
+                                    (scanline [3*i + 2] << 16);
+                            */
+                            dest[i] = 0xff000000 |                 // alpha
+                                      (scanline[3 * i + 0] << 0) | // r
+                                      (scanline[3 * i + 1] << 8) | // g
+                                      (scanline[3 * i + 2] << 16); // b
 
 #endif
-			    }
-		    }
-		    dest += im->pitch;
-	    }
-	}
+                        }
+                    }
+                    dest += im->pitch;
+                }
+            }
+        }
+
+        jpeg_finish_decompress(&cinfo);
     }
-
-    jpeg_finish_decompress(&cinfo);
-
-  }
 
     return im;
 }

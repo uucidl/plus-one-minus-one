@@ -11,7 +11,7 @@
 //    documentation and/or other materials provided with the distribution.
 // 3. The name of the author may not be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -34,28 +34,28 @@
 #include <stdlib.h>
 
 #ifndef NULL
- #define NULL 0L
+#define NULL 0L
 #endif
 
 #define TRUE 1
 #define FALSE 0
 
-struct LogCategory _LOGV(LOG_ROOT_CAT) = {
-    0, 0, 0,
-    "root", LP_UNINITIALIZED, 0,
-    NULL, 0
-};
+struct LogCategory _LOGV(LOG_ROOT_CAT) = {0, 0, 0, "root", LP_UNINITIALIZED, 0,
+                                          NULL, 0};
 
-static const char* s_controlString = NULL;
+static const char *s_controlString = NULL;
 
-static const char* applyControlString(struct LogCategory* cat) {
+static const char *applyControlString(struct LogCategory *cat)
+{
 
-    const char* cp = s_controlString;
-    
-    if (cp == NULL) return NULL;
+    const char *cp = s_controlString;
+
+    if (cp == NULL)
+        return NULL;
 
     while (*cp != 0) {
-        const char *name, *dot, *eq;;
+        const char *name, *dot, *eq;
+        ;
         cp += strspn(cp, " ");
         name = cp;
         cp += strcspn(cp, ".= ");
@@ -66,8 +66,7 @@ static const char* applyControlString(struct LogCategory* cat) {
         if (*dot != '.' || *eq != '=') {
 
             return "Invalid control string";
-        }
-        else if (0 == strncmp(name, cat->name, dot - name)) {
+        } else if (0 == strncmp(name, cat->name, dot - name)) {
             if (0 == strncmp(dot + 1, "thresh", eq - dot - 1)) {
                 log_setThreshold(cat, atoi(eq + 1));
             }
@@ -76,12 +75,12 @@ static const char* applyControlString(struct LogCategory* cat) {
     return "";
 } // applyControlString
 
-void _log_logEvent(struct LogCategory* category, struct LogEvent* ev, ...)
+void _log_logEvent(struct LogCategory *category, struct LogEvent *ev, ...)
 {
-    struct LogCategory* cat = category;
+    struct LogCategory *cat = category;
     va_start(ev->ap, ev);
-    while(1) {
-        struct LogAppender* appender = cat->appender;
+    while (1) {
+        struct LogAppender *appender = cat->appender;
         if (appender != NULL) {
             appender->doAppend(appender, ev);
         }
@@ -89,11 +88,12 @@ void _log_logEvent(struct LogCategory* category, struct LogEvent* ev, ...)
             break;
 
         cat = cat->parent;
-    } 
+    }
     va_end(ev->ap);
 } // _log_logEvent
 
-static const char * initCategory(struct LogCategory* category) {
+static const char *initCategory(struct LogCategory *category)
+{
     if (category == &_LOGV(LOG_ROOT_CAT)) {
         category->thresholdPriority = LP_WARNING;
         category->appender = log_defaultLogAppender;
@@ -105,24 +105,26 @@ static const char * initCategory(struct LogCategory* category) {
 
 /**
  * This gets called the first time a category is referenced and performs the
- * initialization. 
+ * initialization.
  * Also resets threshold to inherited!
  */
-int _log_initCat(int priority, struct LogCategory* category) {
-    
+int _log_initCat(int priority, struct LogCategory *category)
+{
+
     initCategory(category);
-        
+
     return priority >= category->thresholdPriority;
 } // _log_initCat
 
-void log_setParent(struct LogCategory* cat, struct LogCategory* parent) {
+void log_setParent(struct LogCategory *cat, struct LogCategory *parent)
+{
 
     assert(parent != NULL);
 
     // unlink from current parent
     if (cat->thresholdPriority != LP_UNINITIALIZED) {
-        struct LogCategory** cpp = &parent->firstChild;
-        while(*cpp != cat && *cpp != NULL) {
+        struct LogCategory **cpp = &parent->firstChild;
+        while (*cpp != cat && *cpp != NULL) {
             cpp = &(*cpp)->nextSibling;
         }
         assert(*cpp == cat);
@@ -138,18 +140,17 @@ void log_setParent(struct LogCategory* cat, struct LogCategory* parent) {
     if (parent->thresholdPriority == LP_UNINITIALIZED) {
         initCategory(parent);
     }
-    
+
     // Reset priority
     cat->thresholdPriority = parent->thresholdPriority;
     cat->isThreshInherited = TRUE;
-    
+
 } // log_setParent
 
-static void setInheritedThresholds(struct LogCategory* cat)
+static void setInheritedThresholds(struct LogCategory *cat)
 {
-    struct LogCategory* child = cat->firstChild;
-    for( ; child != NULL; child = child->nextSibling)
-    {
+    struct LogCategory *child = cat->firstChild;
+    for (; child != NULL; child = child->nextSibling) {
         if (child->isThreshInherited) {
             child->thresholdPriority = cat->thresholdPriority;
             setInheritedThresholds(child);
@@ -157,13 +158,15 @@ static void setInheritedThresholds(struct LogCategory* cat)
     }
 }
 
-void log_setThreshold(struct LogCategory* cat, int thresholdPriority) {
+void log_setThreshold(struct LogCategory *cat, int thresholdPriority)
+{
     cat->thresholdPriority = thresholdPriority;
     cat->isThreshInherited = FALSE;
     setInheritedThresholds(cat);
 }
 
-const char* log_setControlString(const char* cs) {
+const char *log_setControlString(const char *cs)
+{
     if (s_controlString == NULL) {
         s_controlString = cs;
         return initCategory(&_LOGV(LOG_ROOT_CAT));
@@ -172,6 +175,7 @@ const char* log_setControlString(const char* cs) {
     }
 }
 
-void log_setAppender(struct LogCategory* cat, struct LogAppender* app) {
+void log_setAppender(struct LogCategory *cat, struct LogAppender *app)
+{
     cat->appender = app;
 }
