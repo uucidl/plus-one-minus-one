@@ -109,8 +109,7 @@ static void pan_sdl_start(pan_driver_t *zelf)
 
 static void pan_sdl_stop(pan_driver_t *zelf)
 {
-    pan_sdl_driver_t *self = (pan_sdl_driver_t *)zelf;
-
+    (void)zelf; // unused
     SDL_PauseAudio(1);
     SDL_CloseAudio();
 }
