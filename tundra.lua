@@ -94,7 +94,13 @@ Build {
                                 "OpenGL"
                         },
                         Env = {
-                           CCOPTS = {
+                                CXXOPTS = {
+                                        "-Wall -Werror -Wno-unused-function",
+                                        { "-O2" ; Config = "*-gcc-release-*" },
+                                        { "-O2" ; Config = "*-clang-release-*" },
+                                        { "-O0 -g" ; Config = "*-*-debug-*" },
+                                },
+                                CCOPTS = {
                                         "-Wall -Werror -Wno-unused-function",
                                         "`sdl-config --cflags`",
                                         "`freetype-config --cflags`",

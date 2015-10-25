@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *

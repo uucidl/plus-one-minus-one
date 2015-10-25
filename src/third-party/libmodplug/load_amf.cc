@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -15,7 +13,9 @@
 // - Advanced Music Format(DSM)
 //
 ///////////////////////////////////////////////////
+
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 //#define AMFLOG
@@ -416,7 +416,6 @@ BOOL CSoundFile::ReadAMF(LPCBYTE lpStream, DWORD dwMemLength)
     }
     // Store tracks positions
     BYTE **pTrackData = new BYTE *[realtrackcnt];
-    memset(pTrackData, 0, sizeof(pTrackData));
     for (UINT iTrack = 0; iTrack < realtrackcnt; iTrack++)
         if (dwMemPos + 3 <= dwMemLength) {
             UINT nTrkSize = *(USHORT *)(lpStream + dwMemPos);

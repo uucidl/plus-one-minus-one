@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -7,9 +5,11 @@
  *          Adam Goode       <adam@evdebs.org> (endian and char fixes for PPC)
 */
 
-#include <math.h> //for GCCFIX
 #include "stdafx.h"
+
 #include "sndfile.h"
+
+#include <math.h> //for GCCFIX
 
 #ifdef MMCMP_SUPPORT
 extern BOOL MMCMP_Unpack(LPCBYTE *ppMemFile, LPDWORD pdwMemLength);
@@ -1145,7 +1145,8 @@ UINT CSoundFile::ReadSample(MODINSTRUMENT *pIns, UINT nFlags, LPCSTR lpMemFile,
             memcpy(pIns->pSample, lpMemFile, len);
         short int *pSample = (short int *)pIns->pSample;
         for (UINT j = 0; j < len; j += 2) {
-            *pSample++ = bswapLE16(*pSample);
+            *pSample = bswapLE16(*pSample);
+            ++pSample;
         }
     } break;
 
@@ -1335,7 +1336,8 @@ UINT CSoundFile::ReadSample(MODINSTRUMENT *pIns, UINT nFlags, LPCSTR lpMemFile,
         WORD *pSampleW = (WORD *)pIns->pSample;
         for (UINT j = 0; j < len; j += 2) // swaparoni!
         {
-            *pSampleW++ = bswapLE16(*pSampleW);
+            *pSampleW = bswapLE16(*pSampleW);
+            ++pSampleW;
         }
     } break;
 
