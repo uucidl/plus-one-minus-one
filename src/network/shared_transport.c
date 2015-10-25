@@ -13,13 +13,13 @@
 #include <log4c.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_NETWORK_SHARED_TRANSPORT);
 
-#include <network/transport.h>
-#include <network/shared_transport.h>
-#include <network/channel.h>
-#include <libc/pthread.h>
-#include <library/vector_impl.h>
 #include <lib/chance.h>
+#include <libc/pthread.h>
 #include <library/time.h>
+#include <library/vector_impl.h>
+#include <network/channel.h>
+#include <network/shared_transport.h>
+#include <network/transport.h>
 
 #include <libc/sys/time.h>
 #include <libc/sys/types.h>
