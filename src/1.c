@@ -540,7 +540,7 @@ static void modplug_callback(void *self, double ms, unsigned int chn,
 string_t *seer_string;
 const char *seer_cstring_en =
     /* 1 */
-    "I say that one must be a |seer|, make oneself a |seer|.\n"
+    u8"I say that one must be a |seer|, make oneself a |seer|.\n"
     /* 2 */
     "The Poet makes himself a |seer| by a long, immense, and rational "
     "|derangement| of |all the senses|.\n"
@@ -583,14 +583,14 @@ const char *seer_cstring_en =
 
 const char *seer_cstring_fr =
     /* 1 */
-    "Je dis qu'il faut être |voyant|, se faire |voyant|.\n"
+    u8"Je dis qu'il faut Ãªtre |voyant|, se faire |voyant|.\n"
     /* 2 */
-    "Le Poète se fait |voyant| par un long, immense et raisonné "
-    "|dérèglement| de |tous les sens|.\n"
+    "Le PoÃ¨te se fait |voyant| par un long, immense et raisonnÃ© "
+    "|dÃ©rÃ¨glement| de |tous les sens|.\n"
     /* 3 */
     "Toutes les formes d'amour, de souffrance, de folie;\n"
     /* 4 */
-    "il cherche lui-même, il épuise en lui tous les poisons, "
+    "il cherche lui-mÃªme, il Ã©puise en lui tous les poisons, "
     "pour n'en garder que les quintessences.\n"
     /* 5 */
     "...\n"
@@ -602,39 +602,39 @@ const char *seer_cstring_fr =
     "\n"
     "...\n"
     /* 6 */
-    "Cet avenir sera matérialiste, vous le voyez ;\n"
+    "Cet avenir sera matÃ©rialiste, vous le voyez ;\n"
     /* 7 */
     "-- Toujours pleins du Nombre et de l'Harmonie "
-    "ces poèmes seront faits pour rester.\n"
+    "ces poÃ¨mes seront faits pour rester.\n"
     /* 8 */
-    "L'art éternel aurait ses fonctions ; comme les poètes "
+    "L'art Ã©ternel aurait ses fonctions ; comme les poÃ¨tes "
     "sont citoyens.\n"
     /* 9 */
-    "La Poésie ne rythmera plus l'action ;\n"
+    "La PoÃ©sie ne rythmera plus l'action ;\n"
     /* a */
     "elle |sera en avant.|\n"
     "\n"
     /* b */
-    "En attendant, demandons aux |poètes| du |nouveau| ;\n"
+    "En attendant, demandons aux |poÃ¨tes| du |nouveau| ;\n"
     /* c */
-    " -- idées et formes.\n"
+    " -- idÃ©es et formes.\n"
     /* d */
-    "Tous les habiles croiraient bientôt avoir satisfait à cette demande.\n"
+    "Tous les habiles croiraient bientÃ´t avoir satisfait Ã  cette demande.\n"
     /* e */
     " -- Ce n'est pas cela !\n"
     /* f */
-    "Les inventions d'inconnu réclament des formes nouvelles.\n";
+    "Les inventions d'inconnu rÃ©clament des formes nouvelles.\n";
 
 const char *seer_cstring_fi =
     /* 1 */
-    "Jonkun täytyy olla |näkijä|, tee siis itsestäsi |näkijä|.\n"
+    u8"Jonkun tÃ¤ytyy olla |nÃ¤kijÃ¤|, tee siis itsestÃ¤si |nÃ¤kijÃ¤|.\n"
     /* 2 */
-    "Pitkä, suunnaton ja järjellinen |kaikkien aistien|"
-    "|epäjärjestys| tekee runoilija |näkijän|.\n"
+    "PitkÃ¤, suunnaton ja jÃ¤rjellinen |kaikkien aistien|"
+    "|epÃ¤jÃ¤rjestys| tekee runoilija |nÃ¤kijÃ¤n|.\n"
     /* 3 */
-    "Kaikki rakkauden, kärsimyksen ja mielipuolisuuden muodot ;\n"
+    "Kaikki rakkauden, kÃ¤rsimyksen ja mielipuolisuuden muodot ;\n"
     /* 4 */
-    "hän etsii itseään, käyttää ruumiin myrkkyjään, vain säilyttääkseen"
+    "hÃ¤n etsii itseÃ¤Ã¤n, kÃ¤yttÃ¤Ã¤ ruumiin myrkkyjÃ¤Ã¤n, vain sÃ¤ilyttÃ¤Ã¤kseen"
     "osan olennaista.\n"
     /* 5 */
     "..."
@@ -646,23 +646,23 @@ const char *seer_cstring_fi =
     "\n"
     "...\n"
     /* 6 */
-    "Tulevaisuus on materialistinen, kuten voit nähdä ;\n"
+    "Tulevaisuus on materialistinen, kuten voit nÃ¤hdÃ¤ ;\n"
     /* 7 */
-    "Aina täynnä Lukuja ja Harmoniaa, runot tehtyinä jäädäkseen.\n"
+    "Aina tÃ¤ynnÃ¤ Lukuja ja Harmoniaa, runot tehtyinÃ¤ jÃ¤Ã¤dÃ¤kseen.\n"
     /* 8 */
-    "Ikuinen taide täyttää tarkoituksensa, koska runoilijat ovat kansalaisia.\n"
+    "Ikuinen taide tÃ¤yttÃ¤Ã¤ tarkoituksensa, koska runoilijat ovat kansalaisia.\n"
     /* 9 */
-    "Runous ei lainaa rytmiään tekoihin ;\n"
+    "Runous ei lainaa rytmiÃ¤Ã¤n tekoihin ;\n"
     /* 10 */
-    "se on |edellä niitä|.\n"
+    "se on |edellÃ¤ niitÃ¤|.\n"
     /* 11 */
-    "Kysykäämme |runoilijalta| jotakin |uutta| ;\n"
+    "KysykÃ¤Ã¤mme |runoilijalta| jotakin |uutta| ;\n"
     /* 12 */
     "- ajatuksia ja muotoa.\n"
     /* 13 */
-    "Kaikki taitajat uskovat pian saavuttaneensa tämän vaatimuksen :\n"
+    "Kaikki taitajat uskovat pian saavuttaneensa tÃ¤mÃ¤n vaatimuksen :\n"
     /* 14 */
-    "- Näin ei tapahdu !\n"
+    "- NÃ¤in ei tapahdu !\n"
     /* 15 */
     "tuntemattoman keksiminen vaatii uusia muotoja.\n";
 
@@ -1344,7 +1344,6 @@ int main(int argc, char **argv)
         double p = 10000.0;
         metro = metronome_instantiate_toplevel(NULL);
         metro->new (metro, 120000.0, p, 50.0);
-
         metro2 = metronome_instantiate_toplevel(NULL);
     }
 

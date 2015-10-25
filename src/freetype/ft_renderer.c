@@ -22,10 +22,10 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_FREETYPE_FT_RENDERER);
 
 //#include <freetype/internal/ftobjs.h>
 
-#include <library/stream.h>
-#include <libc/stdlib.h>
-#include <libc/math.h>
 #include <lib/url_open.h>
+#include <libc/math.h>
+#include <libc/stdlib.h>
+#include <library/stream.h>
 
 static FT_Library library = NULL;
 static int init_p = 0;
@@ -245,6 +245,75 @@ static void ft_draw_span(int y, int count, FT_Span const *spans, void *user)
     }
 }
 
+/// @see
+/// [economical-utf8.html](http://bjoern.hoehrmann.de/utf-8/decoder/dfa/index.html)
+enum {
+    UTF8_ACCEPT = 0,
+    UTF8_REJECT = 1,
+};
+
+static uint8_t const utf8d[] = {
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   1,   1,   1,   1,   1,   1,   1,
+    1,   1,   1,   1,   1,   1,   1,   1,   1,   9,   9,   9,   9,   9,   9,
+    9,   9,   9,   9,   9,   9,   9,   9,   9,   9,   7,   7,   7,   7,   7,
+    7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,
+    7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   7,   8,   8,   2,
+    2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,
+    2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   2,   0xa,
+    0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x4, 0x3, 0x3,
+    0xb, 0x6, 0x6, 0x6, 0x5, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8, 0x8,
+    0x8, 0x0, 0x1, 0x2, 0x3, 0x5, 0x8, 0x7, 0x1, 0x1, 0x1, 0x4, 0x6, 0x1, 0x1,
+    0x1, 0x1, 1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
+    1,   1,   1,   1,   0,   1,   1,   1,   1,   1,   0,   1,   0,   1,   1,
+    1,   1,   1,   1,   1,   2,   1,   1,   1,   1,   1,   2,   1,   2,   1,
+    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   2,   1,   1,
+    1,   1,   1,   1,   1,   1,   1,   2,   1,   1,   1,   1,   1,   1,   1,
+    2,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   3,
+    1,   3,   1,   1,   1,   1,   1,   1,   1,   3,   1,   1,   1,   1,   1,
+    3,   1,   3,   1,   1,   1,   1,   1,   1,   1,   3,   1,   1,   1,   1,
+    1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
+};
+
+/**
+ * decodes UTF-8 streams.
+ *
+ * @param state must be UTF8_ACCEPT initially
+ */
+static inline uint32_t utf8_decode(uint32_t *state, uint32_t *codep,
+                                   uint8_t byte)
+{
+    uint32_t type = utf8d[byte];
+
+    *codep = (*state != UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
+                                     : (0xff >> type) & (byte);
+
+    *state = utf8d[256 + *state * 16 + type];
+
+    return *state;
+}
+
+static uint32_t next_codepoint(string_iterator_t *string_it)
+{
+    uint32_t utf8_state = UTF8_ACCEPT;
+    uint32_t codepoint = 0;
+
+    const char *cp;
+    while ((cp = string_it->next(string_it)) &&
+           utf8_decode(&utf8_state, &codepoint, *cp) != UTF8_ACCEPT) {
+        /* must decode a bit more */
+    }
+
+    return codepoint;
+}
+
 static void ft_compute_string_extent(ft_renderer_t *self, image_t *destination,
                                      string_t *string)
 {
@@ -270,7 +339,6 @@ static void ft_compute_string_extent(ft_renderer_t *self, image_t *destination,
         ERROR1("couldn't set pixel size");
 
     string_iterator_t it;
-    const char *cp;
 
     if (!string->get_iterator(string, &it))
         return;
@@ -278,9 +346,9 @@ static void ft_compute_string_extent(ft_renderer_t *self, image_t *destination,
     float x = 0.f;
     float y = self->font_height;
 
-    while ((cp = it.next(&it))) {
-        /* assume first unicode page */
-        int glyph_index = FT_Get_Char_Index(face, 0x00ff & *cp);
+    uint32_t codepoint;
+    while ((codepoint = next_codepoint(&it))) {
+        int glyph_index = FT_Get_Char_Index(face, codepoint);
 
         error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
         if (error)
@@ -331,14 +399,14 @@ static void ft_draw_string_direct(ft_renderer_t *self, image_t *image,
         ERROR1("couldn't set pixel size");
 
     string_iterator_t it;
-    const char *cp;
 
     if (!string->get_iterator(string, &it))
         return;
 
-    while ((cp = it.next(&it))) {
+    uint32_t codepoint;
+    while ((codepoint = next_codepoint(&it))) {
         /* assume first unicode page */
-        int glyph_index = FT_Get_Char_Index(face, 0x00ff & *cp);
+        int glyph_index = FT_Get_Char_Index(face, codepoint);
 
         error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
         if (error)
@@ -411,10 +479,6 @@ static void ft_draw_outline(ft_renderer_t *self, image_t *image,
         params.clip_box.xMax = (image->width - 1 - self->pen_x);
         params.clip_box.yMin = (-image->height + 1 + self->pen_y);
         params.clip_box.yMax = (self->pen_y);
-
-        DEBUG5("clip_box: x: %d - %d, y: %d - %d\n", params.clip_box.xMin >> 6,
-               params.clip_box.xMax >> 6, params.clip_box.yMin >> 6,
-               params.clip_box.yMax >> 6);
     }
 #endif
 
