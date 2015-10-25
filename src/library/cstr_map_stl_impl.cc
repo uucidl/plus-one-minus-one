@@ -18,11 +18,7 @@ extern "C" {
 #undef delete
 }
 
-#if defined(__GNUC__) && __GNUC__ <= 2
-#include <hash_map>
-#else
-#include <ext/hash_map>
-#endif
+#include <unordered_map>
 
 struct eqstr {
     bool operator()(const char *s1, const char *s2) const
@@ -31,23 +27,21 @@ struct eqstr {
     }
 };
 
-#if defined(__GNUC__) && __GNUC__ >= 3
-#define HASH_MAP_NS __gnu_cxx
-#elif defined(__MSVC__)
-#if _MSC_VER >= 1300
-#define HASH_MAP_NS stdext
-#else
-#define HASH_MAP_NS std
-#endif
-#elif defined(__GNUC__) && __GNUC__ == 2
-#define HASH_MAP_NS std
-#else
-#error please define the namespace for hash_map
-#endif
+struct hashstr {
+    uint32_t operator()(const char *str) const
+    {
+        uint32_t hash = 5381;
+        int c;
 
-typedef HASH_MAP_NS::hash_map<const char *, void *,
-                              HASH_MAP_NS::hash<const char *>,
-                              eqstr> our_hash_map_t;
+        while ((c = *str++)) {
+            hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+        }
+
+        return hash;
+    }
+};
+
+typedef std::unordered_map<const char *, void *, hashstr, eqstr> our_hash_map_t;
 typedef our_hash_map_t::iterator our_hash_map_iterator_t;
 typedef struct iterator_state_t {
     our_hash_map_iterator_t iterator;
