@@ -35,6 +35,7 @@ typedef struct text_display_t
     /* start x and y */
     double x, y;            
     unsigned int font_height;
+    unsigned int ghost_offset;
 } text_display_t;
 
 CLASS_INHERIT(text_display, video_effect)
