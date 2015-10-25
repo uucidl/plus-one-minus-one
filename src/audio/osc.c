@@ -9,10 +9,10 @@
  * full acceptance and understanding.
  * e 613 */
 
-#include <audio/wrapper.h>
 #include <audio/osc.h>
-#include <system/pan.h>
+#include <audio/wrapper.h>
 #include <libc/stdlib.h>
+#include <system/pan.h>
 
 static int osc_new(osc_t *self, wavetable_t w, int sample_rate)
 {
@@ -57,13 +57,6 @@ static sample_t osc_next(osc_t *self)
     wrapper_increment(self->wrapper, self->phase_increment);
 
     return s;
-}
-
-static sample_t osc_get(osc_t *self, double ms)
-{
-    wrapper_set(self->wrapper,
-                ms / 1000.0 * self->sample_rate * self->phase_increment);
-    return wavetable_get_linear(self->wavetable, self->wrapper);
 }
 
 osc_t *osc_instantiate(osc_t *x)
