@@ -9,17 +9,17 @@
  * full acceptance and understanding.
  * e 72 */
 
+#include "vmix.h"
 #include <libc/math.h>
-#include <system/main.h>
-#include <libc/stdlib.h>
 #include <libc/stdio.h>
+#include <libc/stdlib.h>
 #include <libc/string.h>
 #include <system/effects.h>
-#include "vmix.h"
+#include <system/main.h>
 
+#include <lib/chance.h>
 #include <lib/pixel.h>
 #include <scripting/compile.h>
-#include <lib/chance.h>
 
 #include <log4c.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_VMIX);
@@ -110,6 +110,7 @@ static void vmix_set_right_offset_ms(vmix_t *self, double ms)
     self->right_ms = ms;
 }
 
+#if defined(P1M1_UNUSED)
 static inline void blit_amp_add(vmix_t *self, int32_t *__restrict__ pixelsd,
                                 int32_t *__restrict__ pixelss, double amp)
 {
@@ -125,25 +126,23 @@ static inline void blit_amp_add(vmix_t *self, int32_t *__restrict__ pixelsd,
     }
 }
 
-#if 0
-static inline
-void blit_mix(vmix_t* self, 
-	      int32_t* __restrict__ pixelsd, int32_t* __restrict__ pixelsl,
-	      int32_t* __restrict__ pixelsr, double amp)
+static inline void blit_mix(vmix_t *self, int32_t *__restrict__ pixelsd,
+                            int32_t *__restrict__ pixelsl,
+                            int32_t *__restrict__ pixelsr, double amp)
 {
     int amount = self->super.width * self->super.height;
-    while(amount--) {
-	float r = amp*((*pixelsl >> 16) & 0xff);
-	float g = amp*((*pixelsl >> 8) & 0xff);
-	float b = amp*((*pixelsl) & 0xff);
-	r += (1.0-amp)*((*pixelsr >> 16) & 0xff);
-	g += (1.0-amp)*((*pixelsr >> 8) & 0xff);
-	b += (1.0-amp)*((*pixelsr) & 0xff);
+    while (amount--) {
+        float r = amp * ((*pixelsl >> 16) & 0xff);
+        float g = amp * ((*pixelsl >> 8) & 0xff);
+        float b = amp * ((*pixelsl) & 0xff);
+        r += (1.0 - amp) * ((*pixelsr >> 16) & 0xff);
+        g += (1.0 - amp) * ((*pixelsr >> 8) & 0xff);
+        b += (1.0 - amp) * ((*pixelsr) & 0xff);
 
-	*pixelsd = ((int)(r) << 16) | ((int)(g)<<8) | (int)(b);
-	pixelsl++;
-	pixelsr++;
-	pixelsd++;
+        *pixelsd = ((int)(r) << 16) | ((int)(g) << 8) | (int)(b);
+        pixelsl++;
+        pixelsr++;
+        pixelsd++;
     }
 }
 #endif
