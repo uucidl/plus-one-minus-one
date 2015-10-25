@@ -13,6 +13,7 @@
 #define _VMIX_H_
 
 #include <libc/stdint.h>
+#include <system/video_effect.h>
 
 enum vmix_type { CROSSFADE, MUTILATE };
 
