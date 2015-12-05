@@ -434,8 +434,7 @@ static void *ts_run(selector_t *zelf)
                                 cbs->write(cbs, c, self->buffer, BUFSIZE);
                             // write to socket
                             if (nbytes) {
-                                int n = 0;
-                                n = stream_get_callbacks(&stream->super)
+                                stream_get_callbacks(&stream->super)
                                         ->write(self->buffer, 1, nbytes,
                                                 &stream->super);
 

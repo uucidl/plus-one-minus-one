@@ -459,7 +459,6 @@ static void ft_draw_outline(ft_renderer_t *self, image_t *image,
                             outline_t *outline)
 {
     FT_Raster_Params params;
-    int error;
     void *user_data[2];
 
     user_data[0] = self;
@@ -482,7 +481,7 @@ static void ft_draw_outline(ft_renderer_t *self, image_t *image,
     }
 #endif
 
-    error = FT_Outline_Render(library, &outline->ftoutline, &params);
+    FT_Outline_Render(library, &outline->ftoutline, &params);
 }
 
 struct oi_data_t {
@@ -604,9 +603,7 @@ static void ft_draw_outlined_image(ft_renderer_t *self, image_t *image,
                                    int y0)
 {
     FT_Raster_Params params;
-    int error;
     struct oi_data_t user_data;
-    ;
 
     user_data.self = self;
     user_data.destination = image;
@@ -635,7 +632,7 @@ static void ft_draw_outlined_image(ft_renderer_t *self, image_t *image,
     }
 #endif
 
-    error = FT_Outline_Render(library, &outline->ftoutline, &params);
+    FT_Outline_Render(library, &outline->ftoutline, &params);
 }
 
 static void ft_draw_cstring(ft_renderer_t *self, image_t *dest, const char *str)

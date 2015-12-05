@@ -83,7 +83,8 @@ Build {
                                 'KNOS_RELEASE=-1',
                                 'KNOS_BUILD=0',
                                 'MMCMP_SUPPORT',
-                                'CCGVERSION=""'
+                                'CCGVERSION=""',
+				'MODPLUG_BASIC_SUPPORT'
                         },
                         Libs = {
                                 "ffi",
@@ -95,7 +96,7 @@ Build {
                         },
                         Env = {
                                 CXXOPTS = {
-                                        "-Wall -Werror -Wno-unused-function",
+                                        "-std=c++11 -Wall -Werror -Wno-unused-function",
                                         { "-O2" ; Config = "*-gcc-release-*" },
                                         { "-O2" ; Config = "*-clang-release-*" },
                                         { "-O0 -g" ; Config = "*-*-debug-*" },

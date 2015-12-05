@@ -50,6 +50,7 @@ double get_unix_milliseconds()
 #elif defined(LINUX)
 
 #include <time.h>
+#include <sys/time.h>
 
 extern double get_milliseconds()
 {

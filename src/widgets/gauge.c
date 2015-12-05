@@ -265,18 +265,6 @@ static void rgauge_render(gauge_t *self, image_t *dest)
     y0 = self->y + self->h / 2;
     r = min(self->w, self->h);
     r /= 2;
-
-    {
-        vector3d_t o, b;
-        //	line_t l = { &o, &b, 0x00ffffff };
-        o.x = x0;
-        o.y = y0;
-        b.x = x0 + r * sin(angle);
-        b.y = y0 - r * cos(angle);
-
-        //	draw_line(dest->pixels, dest->width, dest->height, &l);
-    }
-
     {
         sincos_state_t sstate;
         int n;
