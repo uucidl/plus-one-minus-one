@@ -40,19 +40,17 @@ static void dnd_send_event(const char *uri)
 */
 
 @interface NSWindow (DndEnabled)
-- (id)initDnd;
+- (void)setupDnd;
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender;
 @end
 
 @implementation NSWindow (DndEnabled)
-- (id)initDnd
+- (void)setupDnd
 {
     [self
         registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType,
                                                           nil]];
     TRACE1("initialized dnd.");
-
-    return self;
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
@@ -92,6 +90,6 @@ void dnd_init(event_listener_t *el)
     int n = [wins count];
     int i;
     for (i = 0; i < n; i++) {
-        [[wins objectAtIndex:i] initDnd];
+        [[wins objectAtIndex:i] setupDnd];
     }
 }
