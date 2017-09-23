@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -8,6 +6,7 @@
 */
 
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 ////////////////////////////////////////////////////////
@@ -553,10 +552,10 @@ BOOL CSoundFile::ReadXM(const BYTE *lpStream, DWORD dwMemLength)
             pins->name[21] = 0;
         }
 #if 0
-		if ((xmsh.reserved2 > nsamples) && (xmsh.reserved2 <= 16))
-		{
-			dwMemPos += (((UINT)xmsh.reserved2) - nsamples) * xmsh.shsize;
-		}
+                if ((xmsh.reserved2 > nsamples) && (xmsh.reserved2 <= 16))
+                {
+                        dwMemPos += (((UINT)xmsh.reserved2) - nsamples) * xmsh.shsize;
+                }
 #endif
         for (UINT ismpd = 0; ismpd < nsamples; ismpd++) {
             if ((samplemap[ismpd]) && (samplesize[ismpd]) &&

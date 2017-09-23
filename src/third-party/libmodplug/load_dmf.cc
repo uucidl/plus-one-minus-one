@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -10,6 +8,7 @@
 // DMF DELUSION DIGITAL MUSIC FILEFORMAT (X-Tracker) //
 ///////////////////////////////////////////////////////
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 //#define DMFLOG

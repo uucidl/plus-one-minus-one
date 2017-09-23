@@ -1,6 +1,5 @@
-
-
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 //#define MT2DEBUG
@@ -283,10 +282,10 @@ BOOL CSoundFile::ReadMT2(LPCBYTE lpStream, DWORD dwMemLength)
                             rptcount = p[pos++];
                             infobyte = p[pos++];
 #if 0
-						Log("(%d.%d) FF(%02X).%02X\n", row, ch, rptcount, infobyte);
-					} else
-					{
-						Log("(%d.%d) %02X\n", row, ch, infobyte);
+                                                Log("(%d.%d) FF(%02X).%02X\n", row, ch, rptcount, infobyte);
+                                        } else
+                                        {
+                                                Log("(%d.%d) %02X\n", row, ch, infobyte);
 #endif
                         }
                         if (infobyte & 0x7f) {

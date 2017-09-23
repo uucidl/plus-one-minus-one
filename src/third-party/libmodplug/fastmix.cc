@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -8,6 +6,7 @@
 */
 
 #include "stdafx.h"
+
 #include "sndfile.h"
 #include <math.h>
 
@@ -324,7 +323,7 @@ CzWINDOWEDFIR sfir;
 // Mixing Macros
 
 #define SNDMIX_BEGINSAMPLELOOP8                                                \
-    register MODCHANNEL *const pChn = pChannel;                                \
+    MODCHANNEL *const pChn = pChannel;                                         \
     nPos = pChn->nPosLo;                                                       \
     const signed char *p = (signed char *)(pChn->pCurrentSample + pChn->nPos); \
     if (pChn->dwFlags & CHN_STEREO)                                            \
@@ -333,7 +332,7 @@ CzWINDOWEDFIR sfir;
     do {
 
 #define SNDMIX_BEGINSAMPLELOOP16                                               \
-    register MODCHANNEL *const pChn = pChannel;                                \
+    MODCHANNEL *const pChn = pChannel;                                         \
     nPos = pChn->nPosLo;                                                       \
     const signed short *p =                                                    \
         (signed short *)(pChn->pCurrentSample + (pChn->nPos * 2));             \
@@ -738,10 +737,10 @@ typedef VOID(MPPASMCALL *LPMIXINTERFACE)(MODCHANNEL *, int *, int *);
 //
 
 void MPPASMCALL X86_InitMixBuffer(int *pBuffer, UINT nSamples);
-void MPPASMCALL
-X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer, UINT nSamples);
-void MPPASMCALL
-X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs);
+void MPPASMCALL X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer,
+                                  UINT nSamples);
+void MPPASMCALL X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs,
+                               LPLONG lpLOfs);
 void X86_StereoMixToFloat(const int *, float *, float *, UINT nCount);
 void X86_FloatToStereoMix(const float *pIn1, const float *pIn2, int *pOut,
                           UINT nCount);
@@ -1689,8 +1688,7 @@ __declspec(naked) DWORD MPPASMCALL
                      LPLONG lpMin, LPLONG lpMax)
 //----------------------------------------------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         push ebx push esi push edi mov ebx, 16 [esp] // ebx = 8-bit buffer
             mov esi,
             20 [esp] // esi = pBuffer
@@ -1765,8 +1763,7 @@ __declspec(naked) DWORD MPPASMCALL
                       LPLONG lpMin, LPLONG lpMax)
 //-----------------------------------------------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         push ebx push esi push edi mov ebx, 16 [esp] // ebx = 16-bit buffer
             mov eax,
             28 [esp] mov esi, 20 [esp] // esi = pBuffer
@@ -1844,8 +1841,7 @@ __declspec(naked) DWORD MPPASMCALL
                       LPLONG lpMin, LPLONG lpMax)
 //-----------------------------------------------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         push ebx push esi push edi mov ebx, 16 [esp] // ebx = 8-bit buffer
             mov esi,
             20 [esp] // esi = pBuffer
@@ -1912,8 +1908,7 @@ __declspec(naked) DWORD MPPASMCALL
                       LPLONG lpMin, LPLONG lpMax)
 //-----------------------------------------------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         push ebx push esi push edi mov ebx, 16 [esp] // ebx = 32-bit buffer
             mov esi,
             20 [esp] // esi = pBuffer
@@ -1970,8 +1965,7 @@ DWORD MPPASMCALL X86_Convert32To32(LPVOID lp16, int *pBuffer,
 void MPPASMCALL X86_InitMixBuffer(int *pBuffer, UINT nSamples)
 //------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         mov ecx, nSamples mov esi, pBuffer xor eax, eax mov edx, ecx shr ecx,
             2 and edx,
             3 jz unroll4x loop1x : add esi,
@@ -2000,8 +1994,7 @@ __declspec(naked) void MPPASMCALL
     X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf, DWORD nSamples)
 //------------------------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         push ebx push ebp push esi push edi mov ecx,
             28 [esp] // ecx = samplecount
             mov esi,
@@ -2032,8 +2025,8 @@ __declspec(naked) void MPPASMCALL
 #else
 //---GCCFIX: Asm replaced with C function
 // Multichannel not supported.
-void MPPASMCALL
-X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf, DWORD nSamples)
+void MPPASMCALL X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf,
+                                        DWORD nSamples)
 {
 }
 #endif
@@ -2042,8 +2035,7 @@ X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf, DWORD nSamples)
 VOID MPPASMCALL X86_MonoFromStereo(int *pMixBuf, UINT nSamples)
 //-------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         mov ecx, nSamples mov esi, pMixBuf mov edi,
             esi stloop : mov eax,
                          dword ptr[esi] mov edx,
@@ -2071,12 +2063,11 @@ VOID MPPASMCALL X86_MonoFromStereo(int *pMixBuf, UINT nSamples)
 #define OFSDECAYMASK 0xFF
 
 #ifdef MSC_VER
-void MPPASMCALL
-X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs)
+void MPPASMCALL X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs,
+                               LPLONG lpLOfs)
 //---------------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         mov edi, pBuffer mov ecx, nSamples mov eax, lpROfs mov edx,
             lpLOfs mov eax, [eax] mov edx, [edx] or ecx,
             ecx jz fill_loop mov ebx, eax or ebx, edx jz fill_loop ofsloop
@@ -2128,8 +2119,8 @@ X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs)
 //---GCCFIX: Asm replaced with C function
 #define OFSDECAYSHIFT 8
 #define OFSDECAYMASK 0xFF
-void MPPASMCALL
-X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs)
+void MPPASMCALL X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs,
+                               LPLONG lpLOfs)
 //---------------------------------------------------------------------------------------------------------
 {
     int rofs = *lpROfs;
@@ -2153,12 +2144,11 @@ X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs)
 #endif
 
 #ifdef MSC_VER
-void MPPASMCALL
-X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer, UINT nSamples)
+void MPPASMCALL X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer,
+                                  UINT nSamples)
 //----------------------------------------------------------------------------------
 {
-    _asm
-    {
+    _asm {
         mov esi, pChannel mov edi, pBuffer mov ecx, nSamples mov eax,
             dword ptr[esi + MODCHANNEL.nROfs] mov edx,
             dword ptr[esi + MODCHANNEL.nLOfs] or ecx, ecx jz brkloop ofsloop
@@ -2189,8 +2179,8 @@ X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer, UINT nSamples)
 #else
 //---GCCFIX: Asm replaced with C function
 // Will fill in later.
-void MPPASMCALL
-X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer, UINT nSamples)
+void MPPASMCALL X86_EndChannelOfs(MODCHANNEL *pChannel, int *pBuffer,
+                                  UINT nSamples)
 {
     int rofs = pChannel->nROfs;
     int lofs = pChannel->nLOfs;
@@ -2224,35 +2214,35 @@ __declspec(naked) UINT MPPASMCALL
 //-------------------------------------------------------------------------------
 {
     __asm {
-	push ebx
-	push ebp
-	push esi
-	push edi
-	mov esi, 20[esp] // esi = pBuffer+i
-	mov ecx, 24[esp] // ecx = i
-	mov edi, 28[esp] // edi = AGC (0..256)
+        push ebx
+        push ebp
+        push esi
+        push edi
+        mov esi, 20[esp] // esi = pBuffer+i
+        mov ecx, 24[esp] // ecx = i
+        mov edi, 28[esp] // edi = AGC (0..256)
 agcloop:
-	mov eax, dword ptr [esi]
-	imul edi
-	shrd eax, edx, AGC_PRECISION
-	add esi, 4
-	cmp eax, MIXING_LIMITMIN
-	jl agcupdate
-	cmp eax, MIXING_LIMITMAX
-	jg agcupdate
+        mov eax, dword ptr [esi]
+        imul edi
+        shrd eax, edx, AGC_PRECISION
+        add esi, 4
+        cmp eax, MIXING_LIMITMIN
+        jl agcupdate
+        cmp eax, MIXING_LIMITMAX
+        jg agcupdate
 agcrecover:
-	dec ecx
-	mov dword ptr [esi-4], eax
-	jnz agcloop
-	mov eax, edi
-	pop edi
-	pop esi
-	pop ebp
-	pop ebx
-	ret
+        dec ecx
+        mov dword ptr [esi-4], eax
+        jnz agcloop
+        mov eax, edi
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        ret
 agcupdate:
-	dec edi
-	jmp agcrecover
+        dec edi
+        jmp agcrecover
     }
 }
 

@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -16,6 +14,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 //#pragma warning(disable:4244)

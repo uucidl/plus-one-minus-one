@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -7,6 +5,7 @@
 */
 
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 #ifdef MODPLUG_TRACKER
@@ -44,20 +43,20 @@ int gbInitPlugins = 0;
 
 typedef DWORD(MPPASMCALL *LPCONVERTPROC)(LPVOID, int *, DWORD, LPLONG, LPLONG);
 
-extern DWORD MPPASMCALL
-X86_Convert32To8(LPVOID lpBuffer, int *, DWORD nSamples, LPLONG, LPLONG);
-extern DWORD MPPASMCALL
-X86_Convert32To16(LPVOID lpBuffer, int *, DWORD nSamples, LPLONG, LPLONG);
-extern DWORD MPPASMCALL
-X86_Convert32To24(LPVOID lpBuffer, int *, DWORD nSamples, LPLONG, LPLONG);
-extern DWORD MPPASMCALL
-X86_Convert32To32(LPVOID lpBuffer, int *, DWORD nSamples, LPLONG, LPLONG);
+extern DWORD MPPASMCALL X86_Convert32To8(LPVOID lpBuffer, int *, DWORD nSamples,
+                                         LPLONG, LPLONG);
+extern DWORD MPPASMCALL X86_Convert32To16(LPVOID lpBuffer, int *,
+                                          DWORD nSamples, LPLONG, LPLONG);
+extern DWORD MPPASMCALL X86_Convert32To24(LPVOID lpBuffer, int *,
+                                          DWORD nSamples, LPLONG, LPLONG);
+extern DWORD MPPASMCALL X86_Convert32To32(LPVOID lpBuffer, int *,
+                                          DWORD nSamples, LPLONG, LPLONG);
 extern UINT MPPASMCALL X86_AGC(int *pBuffer, UINT nSamples, UINT nAGC);
 extern VOID MPPASMCALL X86_Dither(int *pBuffer, UINT nSamples, UINT nBits);
-extern VOID MPPASMCALL
-X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf, DWORD nSamples);
-extern VOID MPPASMCALL
-X86_StereoFill(int *pBuffer, UINT nSamples, LPLONG lpROfs, LPLONG lpLOfs);
+extern VOID MPPASMCALL X86_InterleaveFrontRear(int *pFrontBuf, int *pRearBuf,
+                                               DWORD nSamples);
+extern VOID MPPASMCALL X86_StereoFill(int *pBuffer, UINT nSamples,
+                                      LPLONG lpROfs, LPLONG lpLOfs);
 extern VOID MPPASMCALL X86_MonoFromStereo(int *pMixBuf, UINT nSamples);
 
 extern short int ModSinusTable[64];
@@ -92,8 +91,7 @@ int _muldiv(long a, long b, long c)
 {
 #ifdef MSC_VER
     int sign, result;
-    _asm
-    {
+    _asm {
         mov eax, a mov ebx, b or eax, eax mov edx, eax jge aneg neg eax aneg
             : xor edx,
               ebx or ebx,
@@ -122,8 +120,7 @@ int _muldivr(long a, long b, long c)
 {
 #ifdef MSC_VER
     int sign, result;
-    _asm
-    {
+    _asm {
         mov eax, a mov ebx, b or eax, eax mov edx, eax jge aneg neg eax aneg
             : xor edx,
               ebx or ebx,
@@ -451,7 +448,7 @@ BOOL CSoundFile::ProcessRow()
                 double ms =
                     5000.0 * m_nTempoFactor * m_nTotalCount /
                     (m_nMusicTempo << 8); /* correct only if the module is
-                                             started at the very beginning */
+                                              started at the very beginning */
                 row_callback(this->row_callback_closure, ms, nChn, m->note,
                              m->instr, m->volcmd, vol, m->command, m->param);
             }

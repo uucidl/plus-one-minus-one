@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -10,6 +8,7 @@
 // DigiTracker (MDL) module loader          //
 //////////////////////////////////////////////
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 //#pragma warning(disable:4244)

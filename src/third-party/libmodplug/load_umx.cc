@@ -1,5 +1,3 @@
-
-
 /*
  * This source code is public domain.
  *
@@ -7,6 +5,7 @@
 */
 
 #include "stdafx.h"
+
 #include "sndfile.h"
 
 #define MODMAGIC_OFFSET (20 + 31 * 30 + 130)

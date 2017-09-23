@@ -1,13 +1,12 @@
-
-
 /*
  * This source code is public domain.
  *
  * Authors: Kenton Varda <temporal@gauge3d.org> (C interface wrapper)
  */
 
-#include "modplug.h"
 #include "stdafx.h"
+
+#include "modplug.h"
 #include "sndfile.h"
 
 struct _ModPlugFile {
@@ -16,12 +15,21 @@ struct _ModPlugFile {
 
 namespace ModPlug
 {
-ModPlug_Settings gSettings = {MODPLUG_ENABLE_OVERSAMPLING |
-                                  MODPLUG_ENABLE_NOISE_REDUCTION,
+ModPlug_Settings gSettings = {
+    MODPLUG_ENABLE_OVERSAMPLING | MODPLUG_ENABLE_NOISE_REDUCTION,
 
-                              2, 16, 44100, MODPLUG_RESAMPLE_LINEAR,
+    2,
+    16,
+    44100,
+    MODPLUG_RESAMPLE_LINEAR,
 
-                              0, 0, 0, 0, 0, 0, 0};
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0};
 
 int gSampleSize;
 
