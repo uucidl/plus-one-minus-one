@@ -9,7 +9,7 @@
  * full acceptance and understanding.
  * e 920 */
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_SAVE_PNG);
 
 #include "image_save_png.h"
@@ -22,19 +22,19 @@ void image_save_png(image_t *image, FILE *fd)
     png_infop info_ptr;
 
     if (!png_write_ptr) {
-        ERROR1("png_write_ptr was null");
+        ERROR("png_write_ptr was null");
         return;
     }
 
     info_ptr = png_create_info_struct(png_write_ptr);
     if (!info_ptr) {
-        ERROR1("info_ptr was null");
+        ERROR("info_ptr was null");
         png_destroy_write_struct(&png_write_ptr, (png_infopp)NULL);
         return;
     }
 
     if (setjmp(png_jmpbuf(png_write_ptr))) {
-        ERROR1("encoding error.");
+        ERROR("encoding error.");
         png_destroy_write_struct(&png_write_ptr, &info_ptr);
         return;
     }

@@ -18,7 +18,7 @@
 #include <SDL.h>
 #include <system/architectures/sdl/keyboard.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(SDL_EVENT_LISTENER);
 
 static key_event_t *
@@ -36,14 +36,11 @@ key_event_fromSDL_KeyboardEvent(key_event_t *x, const SDL_KeyboardEvent *sdl_ke)
             ke->hierarchy[1].adverb = dict->get_atom(dict, "atom");
             ke->hierarchy[1].verb = dict->get_atom(dict, "up");
         }
-        TRACE3("key event: %c (%x)", sdl_ke->keysym.sym & 0xff,
+        TRACE("key event: %c (%x)", sdl_ke->keysym.sym & 0xff,
                sdl_ke->keysym.sym);
 
         ke->hierarchy[2].adverb = dict->get_atom(dict, "atom");
         ke->hierarchy[2].verb = sdl_keysym_to_symbol(sdl_ke->keysym);
-        ke->hierarchy[3].adverb = dict->get_atom(dict, "integer");
-        ke->hierarchy[3].verb =
-            atom_new_integer(sdl_keysym_to_ascii(sdl_ke->keysym));
     }
 
     return ke;
@@ -59,11 +56,11 @@ mouse_event_fromSDL_MouseButtonEvent(mouse_event_t *x,
 
         be = mouse_button_event_instantiate_toplevel(x);
         if (sdl_be->type == SDL_MOUSEBUTTONDOWN) {
-            TRACE2("button: pressed %u", sdl_be->button);
+            TRACE("button: pressed %u", sdl_be->button);
             be->hierarchy[2].adverb = dict->get_atom(dict, "atom");
             be->hierarchy[2].verb = dict->get_atom(dict, "down");
         } else if (sdl_be->type == SDL_MOUSEBUTTONUP) {
-            TRACE2("button: released %u", sdl_be->button);
+            TRACE("button: released %u", sdl_be->button);
             be->hierarchy[2].adverb = dict->get_atom(dict, "atom");
             be->hierarchy[2].verb = dict->get_atom(dict, "up");
         }
@@ -96,7 +93,7 @@ mouse_event_fromSDL_MouseMotionEvent(mouse_event_t *x,
     if (sdl_me) {
         dictionary_t *dict = dictionary_get_instance();
         me = mouse_move_event_instantiate_toplevel(x);
-        TRACE3("motion position: %d %d", sdl_me->x, sdl_me->y);
+        TRACE("motion position: %d %d", sdl_me->x, sdl_me->y);
         me->hierarchy[2].adverb = dict->get_atom(dict, "integer");
         me->hierarchy[2].verb = atom_new_integer(sdl_me->x);
         me->hierarchy[3].adverb = dict->get_atom(dict, "integer");
@@ -152,7 +149,7 @@ static void event_listener_accept(sdl_event_listener_t *self,
         HDROP hdrop = (HDROP)msg->wParam;
         unsigned int i;
         unsigned int n = DragQueryFile(hdrop, 0xFFFFFFFF, NULL, 0);
-        TRACE2("%d files dropped.", n);
+        TRACE("%d files dropped.", n);
         for (i = 0; i < n; i++) {
             drop_event_t drop_event;
             drop_event_fromWIN32_DROPFILES_Message(&drop_event, msg->msg, hdrop,

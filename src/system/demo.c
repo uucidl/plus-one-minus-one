@@ -58,25 +58,6 @@ static void demo_update(demo_t *self, uint32_t *videobuffer)
         kgo_update(videobuffer, 1);
 }
 
-static void demo_send(demo_t *self, const char *message)
-{
-    context_t *c = NULL;
-    bytecode_stream_t *m;
-
-    c = context_instantiate_toplevel(NULL);
-    c->object = self;
-    c->dispatch_now_p = 1;
-
-    m = compile_cstring(message, NULL);
-    self->send_message(self, m, c);
-}
-
-static void demo_send_msg(demo_t *self, bytecode_stream_t *m, context_t *c)
-{
-    receiver_t *r = &self->router.super;
-    r->receive(r, m, c);
-}
-
 static void demo_set_video_effect(demo_t *self, effect_t *e)
 {
     self->kgo_effect_root = e;
@@ -108,8 +89,6 @@ demo_t *demo_instantiate(demo_t *x)
 {
     demo_t *d = demo_instantiate_super(x);
 
-    wildcard_router_instantiate_toplevel(&d->router);
-
     event_listener_instantiate_toplevel(&d->event_listener);
     filtered_listener_instantiate_toplevel(&d->event_filter);
     d->event_filter.listener = &d->event_listener;
@@ -132,8 +111,6 @@ demo_t *demo_instantiate(demo_t *x)
     d->set_unlimited_duration = demo_set_unlimited_duration;
     d->tick = demo_tick;
     d->update = demo_update;
-    d->send_immediate = demo_send;
-    d->send_message = demo_send_msg;
 
     return d;
 }

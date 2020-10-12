@@ -11,7 +11,7 @@
 
 #include "stutter.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_STUTTER);
 
 #include <libc/stdlib.h>
@@ -22,7 +22,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_STUTTER);
 static void stutter_set_block_size(stutter_t *self, unsigned int samples)
 {
     if (samples > 65536) {
-        WARNING2("tried to set block size to an incorrect value. ('%u')",
+        WARNING("tried to set block size to an incorrect value. ('%u')",
                  samples);
         samples = 65535;
     } else if (samples == 0) {
@@ -53,7 +53,7 @@ static void stutter_set_window(stutter_t *self, stutter_window_t window)
             wavetable = wavetable_get_gaussian();
             break;
         case NONE:
-            DEBUG1("cannot happen");
+            DEBUG("cannot happen");
         }
 
         self->window->new (self->window, wavetable, self->super.sample_rate);

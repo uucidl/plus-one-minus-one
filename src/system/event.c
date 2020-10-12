@@ -21,7 +21,7 @@
 
 #include <scripting/compile.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_EVENT);
 
 int event_new(event_t *e, unsigned int size)
@@ -326,7 +326,7 @@ drop_event_t *drop_event_instantiate(drop_event_t *x)
 static int signature_match_event_p(signature_t *self, const event_t *event)
 {
     if (!self->super.size)
-        DEBUG1("empty signature");
+        DEBUG("empty signature");
 
     return event_match_p(&self->super, event);
 }

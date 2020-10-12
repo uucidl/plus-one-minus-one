@@ -17,7 +17,7 @@
 #include <libc/pthread.h>
 #include <library/stack.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_MEMORY);
 
 #include <library/memory_impl.h>
@@ -97,10 +97,10 @@ void object_retire(object_t *x)
 {
     if (x->magic != magic) {
 #ifndef NDEBUG
-        ERROR3("object '%x' of class '%s' hasn't been instantiated.", x,
+        ERROR("object '%x' of class '%s' hasn't been instantiated.", x,
                x->class_name);
 #else
-        ERROR2("object '%x' hasn't been instantiated.", x);
+        ERROR("object '%x' hasn't been instantiated.", x);
 #endif
     } else {
         x->magic = magic_retired;
@@ -109,10 +109,10 @@ void object_retire(object_t *x)
             int success = x->release(x);
             if (!success) {
 #ifndef NDEBUG
-                ERROR3("object '%x' of class '%s' could not be released.", x,
+                ERROR("object '%x' of class '%s' could not be released.", x,
                        x->class_name);
 #else
-                ERROR2("object '%x' could not be released.", x);
+                ERROR("object '%x' could not be released.", x);
 #endif
             }
         }
@@ -161,7 +161,7 @@ allocator_t *alibc_allocator_instantiate(allocator_t *x)
 
 static void *noop_allocate(allocator_t *self, size_t n)
 {
-    ERROR1("You are not supposed to call this.");
+    ERROR("You are not supposed to call this.");
     return NULL;
 }
 
@@ -243,20 +243,20 @@ static void init_allocator_override_key()
     if (allocator_override_key_init_p) {
 #if DISABLE_PTHREAD
         if (pthread_mutex_lock(&allocator_override_key_mutex)) {
-            ERROR1("error, lock stack key mutex");
+            ERROR("error, lock stack key mutex");
         }
 #endif
         if (allocator_override_key_init_p) {
 #if DISABLE_PTHREAD
             if (pthread_key_create(&allocator_override_key, free)) {
-                ERROR1("error, stack key create");
+                ERROR("error, stack key create");
             } else
 #endif
                 allocator_override_key_init_p = 0;
         }
 #if DISABLE_PTHREAD
         if (pthread_mutex_unlock(&allocator_override_key_mutex)) {
-            ERROR1("error, unlock stack key mutex");
+            ERROR("error, unlock stack key mutex");
         }
 #endif
     }
@@ -287,15 +287,15 @@ static kn_stack_t *get_allocator_stack()
 #if DISABLE_PTHREAD
     if (stack_key_init_p) {
         if (pthread_mutex_lock(&stack_key_mutex)) {
-            ERROR1("error, lock stack key mutex");
+            ERROR("error, lock stack key mutex");
         }
         if (stack_key_init_p) {
             if (pthread_key_create(&stack_key, free)) {
-                ERROR1("error, stack key create");
+                ERROR("error, stack key create");
             }
         }
         if (pthread_mutex_unlock(&stack_key_mutex)) {
-            ERROR1("error, unlock stack key mutex");
+            ERROR("error, unlock stack key mutex");
         }
     }
 
@@ -353,7 +353,7 @@ allocator_t *pop_allocator()
     allocator_t *b;
 
     if (s->count(s) == 1) {
-        ERROR1("tried to pop top allocator.");
+        ERROR("tried to pop top allocator.");
         b = s->top(s);
     } else {
         b = s->pop(s);

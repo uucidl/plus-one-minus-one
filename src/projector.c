@@ -21,7 +21,7 @@
 
 #include <lib/url_open.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_PROJECTOR);
 
 static int projector_new(effect_t *self)
@@ -171,14 +171,14 @@ static void projector_set_normalized_magnification(projector_t *self, int i,
 
     image = &source->source;
 
-    DEBUG5("image: %dx%d, effect: %dx%d\n", image->width, image->height,
+    DEBUG("image: %dx%d, effect: %dx%d\n", image->width, image->height,
            self->super.width, self->super.height);
 
     if (image->width > image->height) {
         ratio = 1.0f * self->super.width / image->width;
         source->x = -self->super.width * (z - 1.0f);
         source->y = self->super.height - image->height * ratio * z;
-        DEBUG3("top-right offset: %dx%d\n", source->x, source->y);
+        DEBUG("top-right offset: %dx%d\n", source->x, source->y);
     } else {
         ratio = 1.0f * self->super.height / image->height;
         source->x = self->super.width - image->width * ratio * z;

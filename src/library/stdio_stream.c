@@ -15,7 +15,7 @@
 #include <libc/stdlib.h>
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_STDIO_STREAM);
 
 static char *stdio_get_as_memory_area(stream_t *self, int64_t *returned_size)
@@ -162,7 +162,7 @@ stdio_stream_t *stdio_open(stdio_stream_t *x, const char *path,
     s->fd = fopen(path, mode);
     if (!s->fd) {
         free(s);
-        WARNING2("file '%s' not found", path);
+        WARNING("file '%s' not found", path);
         return NULL;
     } else {
         s->original_path = strdup(path);

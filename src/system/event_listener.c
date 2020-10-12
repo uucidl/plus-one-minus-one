@@ -14,7 +14,7 @@
 #include <library/map_impl.h>
 #include <scripting/dictionary.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_EVENT_LISTENER);
 
 static void event_listener_accept(event_listener_t *self, const event_t *event)
@@ -43,7 +43,7 @@ void event_listener_add_child(struct event_listener_t *self,
                               filtered_listener_t *listener)
 {
     if (listener == NULL) {
-        ERROR1("listener is null.");
+        ERROR("listener is null.");
     } else {
         self->childs.push(&self->childs, listener);
     }

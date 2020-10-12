@@ -17,26 +17,8 @@
 
 #include <system/demo.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_MESSAGING_CLASS);
-
-static atom_t class_attach_instance(class_t *self, receiver_t *receiver)
-{
-    atom_t id = 0;
-
-    if (receiver) {
-        unsigned int i = self->next_instance++;
-        dictionary_t *dict = dictionary_get_instance();
-
-        id = dict->new_atom_from_integer(dict, i);
-
-        self->router->set_child(self->router, id, receiver);
-        TRACE3("added instance '%s' of class '%s'", atom_get_cstring_value(id),
-               atom_get_cstring_value(self->class));
-    }
-
-    return id;
-}
 
 static map_t classes; /* where the class_t are stored */
 static int init_p = 1;
@@ -64,15 +46,8 @@ class_t *init_class(const char *name)
         if (!class) {
             class = calloc(sizeof(class_t), 1);
             class->class = class_atom;
-            class->router = wildcard_router_instantiate_toplevel(NULL);
-            class->attach_instance = class_attach_instance;
             class->next_instance = 0;
             map_put(&classes, (unsigned long)class_atom, class);
-
-            /* attach to demo */
-            demo_get_instance()->router.set_child(&demo_get_instance()->router,
-                                                  class->class,
-                                                  &class->router->super);
         }
     }
 

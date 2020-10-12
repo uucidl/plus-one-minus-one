@@ -11,7 +11,7 @@
 
 #include "kgo_driver.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_KGO_DRIVER);
 
 #include <library/map.h>
@@ -35,7 +35,7 @@ void put_kgo_driver(const char *name, kgo_driver_t *driver)
     atom_t a = dict->new_atom(dict, name);
 
     if (map_value_is_there(m->get(m, (unsigned long)a))) {
-        WARNING2("Redefining kgo driver '%s'\n", name);
+        WARNING("Redefining kgo driver '%s'\n", name);
     }
 
     m->put(m, (unsigned long)a, driver);
@@ -93,7 +93,7 @@ static int video_effect_kgo_driver_configure_demo(kgo_driver_t *self, demo_t *d)
             (frame_type != dict->get_atom(dict, VIDEO_EFFECT_FRAME_TYPE_NAME));
 
         if (error_p) {
-            ERROR3("video effect has invalid frame type: %s. (expected %s)",
+            ERROR("video effect has invalid frame type: %s. (expected %s)",
                    atom_get_cstring_value(frame_type),
                    VIDEO_EFFECT_FRAME_TYPE_NAME);
         }
@@ -102,7 +102,7 @@ static int video_effect_kgo_driver_configure_demo(kgo_driver_t *self, demo_t *d)
     error_p = error_p || !d->kgo_effect_root->new (d->kgo_effect_root);
 
     if (error_p) {
-        ERROR1("couldn't create video effect.");
+        ERROR("couldn't create video effect.");
         return 0;
     }
 

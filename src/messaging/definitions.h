@@ -21,7 +21,7 @@
 #include <library/memory.h>
 #include <scripting/bytecode_stream.h>
 
-typedef void (*recp_f)(context_t *self, ...);
+typedef void (*recp_f)(context_t *c, bytecode_stream_t *message);
 
 typedef struct desc_t {
     atom_t atom;

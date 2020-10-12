@@ -11,7 +11,7 @@
 
 #include "image_fetcher.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_FETCHER);
 
 #include <libc/stdlib.h>
@@ -139,7 +139,7 @@ int http_directory_callback(url_fetcher_t *self, http_stream_t *url_found)
             }
         }
     } else {
-        DEBUG1("stream passed is null");
+        DEBUG("stream passed is null");
     }
 
     return ret_p;
@@ -176,7 +176,7 @@ static void parse_links(url_fetcher_t *state, http_stream_t *stream, int depth)
 
         add_url(state, &stream->url);
 
-        TRACE4("parsing... '%s%s?%s'\n", stream->url.server, stream->url.path,
+        TRACE("parsing... '%s%s?%s'\n", stream->url.server, stream->url.path,
                stream->url.query);
 
         while (stream_get_callbacks(s)->read(&character, 1, 1, s)) {
@@ -265,7 +265,7 @@ static void parse_links(url_fetcher_t *state, http_stream_t *stream, int depth)
 
                         link_url[index] = '\0';
 
-                        TRACE2("url found: %s", link_url);
+                        TRACE("url found: %s", link_url);
 
                         stream2->url.new2(&stream2->url, &stream->url,
                                           link_url);
@@ -277,7 +277,7 @@ static void parse_links(url_fetcher_t *state, http_stream_t *stream, int depth)
                             http_stream_t *effective_stream =
                                 stream2->open(stream2);
                             if (!effective_stream) {
-                                WARNING2("couldn't open %s", link_url);
+                                WARNING("couldn't open %s", link_url);
                             } else {
                                 parse_links(state, effective_stream, depth + 1);
                                 stream_get_callbacks(

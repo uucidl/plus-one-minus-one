@@ -9,7 +9,7 @@
  * full acceptance and understanding.
  * e 296 */
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_LOAD_PNG);
 
 #include "image_load_png.h"
@@ -45,7 +45,7 @@ image_t *image_load_png(image_t *x, stream_t *stream)
 
     is_png = png_check_sig(header, header_n);
     if (!is_png) {
-        WARNING1("not a valid png file.");
+        WARNING("not a valid png file.");
         if (!x)
             free(im);
         return NULL;
@@ -59,7 +59,7 @@ image_t *image_load_png(image_t *x, stream_t *stream)
         png_ptr =
             png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
         if (!png_ptr) {
-            WARNING1("can't init libpng\n");
+            WARNING("can't init libpng\n");
             return im;
         }
 
@@ -122,9 +122,9 @@ image_t *image_load_png(image_t *x, stream_t *stream)
             }
             int channels = png_get_channels(png_ptr, info_ptr);
 
-            TRACE3("image width: %d, height: %d", im->width, im->height);
-            TRACE2("channels: %d", channels);
-            TRACE2("color type: %s", color_type);
+            TRACE("image width: %d, height: %d", im->width, im->height);
+            TRACE("channels: %d", channels);
+            TRACE("color type: %s", color_type);
 
             {
                 int i;

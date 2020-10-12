@@ -12,7 +12,7 @@
 
 #include "ft_renderer.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_FREETYPE_FT_RENDERER);
 
 #include "ft2build.h"
@@ -56,7 +56,7 @@ static int ft_renderer_init()
 
     error = FT_Init_FreeType(&library);
     if (error) {
-        ERROR1("couldn't initialize the freetype library.");
+        ERROR("couldn't initialize the freetype library.");
         ret = 0;
     }
 
@@ -134,7 +134,7 @@ static atom_t ft_load_font_from_stream(ft_renderer_t *self, stream_t *stream)
     int error;
 
     if (!stream) {
-        WARNING1("stream was null.");
+        WARNING("stream was null.");
         return 0;
     } else if (self->faces_next_index < MAX_FACES) {
         FT_Open_Args args = {FT_OPEN_STREAM, NULL, 0, NULL,
@@ -143,13 +143,13 @@ static atom_t ft_load_font_from_stream(ft_renderer_t *self, stream_t *stream)
         error = FT_Open_Face(library, &args, 0,
                              &self->faces[self->faces_next_index]);
         if (error) {
-            ERROR1("couldn't open face.");
+            ERROR("couldn't open face.");
             ret = 0;
         } else {
             error = FT_Select_Charmap(self->faces[self->faces_next_index],
                                       ft_encoding_unicode);
             if (error)
-                WARNING1("couldn't set charmap to unicode.");
+                WARNING("couldn't set charmap to unicode.");
 
             ret = self->faces_next_index + 1;
             self->faces_next_index++;
@@ -336,7 +336,7 @@ static void ft_compute_string_extent(ft_renderer_t *self, image_t *destination,
                                0,                  /* pixel_width */
                                self->font_height); /* pixel_height */
     if (error)
-        ERROR1("couldn't set pixel size");
+        ERROR("couldn't set pixel size");
 
     string_iterator_t it;
 
@@ -396,7 +396,7 @@ static void ft_draw_string_direct(ft_renderer_t *self, image_t *image,
                                0,                  /* pixel_width */
                                self->font_height); /* pixel_height */
     if (error)
-        ERROR1("couldn't set pixel size");
+        ERROR("couldn't set pixel size");
 
     string_iterator_t it;
 
@@ -444,7 +444,7 @@ static void ft_draw_string_direct(ft_renderer_t *self, image_t *image,
                 continue; // ignore errors
         } else {
             /* render bitmap normally */
-            ERROR1("unsupported bitmap character.");
+            ERROR("unsupported bitmap character.");
         }
 
         FT_Done_Glyph(glyph);
@@ -626,7 +626,7 @@ static void ft_draw_outlined_image(ft_renderer_t *self, image_t *image,
         params.clip_box.yMin = (-image->height + 1 + self->pen_y);
         params.clip_box.yMax = (self->pen_y);
 
-        DEBUG5("clip_box: x: %d - %d, y: %d - %d\n", params.clip_box.xMin >> 6,
+        DEBUG("clip_box: x: %d - %d, y: %d - %d\n", params.clip_box.xMin >> 6,
                params.clip_box.xMax >> 6, params.clip_box.yMin >> 6,
                params.clip_box.yMax >> 6);
     }
@@ -740,7 +740,7 @@ ft_renderer_t *ft_renderer_instantiate(ft_renderer_t *x)
     font_id = r->load_font(r, url_open("virtual://fonts/arial.ttf", "rb"));
 #endif
     if (font_id == 0) {
-        ERROR1("couldn't load default font.");
+        ERROR("couldn't load default font.");
     } else {
         r->use_font(r, font_id);
     }

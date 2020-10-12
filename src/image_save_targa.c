@@ -9,7 +9,7 @@
  * full acceptance and understanding.
  * e 133 */
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_SAVE_TARGA);
 
 #include "image_save_targa.h"
@@ -85,7 +85,7 @@ void image_save_targa(image_t *image, FILE *fd)
     write_le8(header + 17, 0);
 
     if (fwrite(header, 18, 1, fd) != 1) {
-        ERROR1("couldn't write header.");
+        ERROR("couldn't write header.");
         return;
     }
 
@@ -105,7 +105,7 @@ void image_save_targa(image_t *image, FILE *fd)
                 write_le8(destination + 2, (pixel & 0x0000ff));
             }
             if (fwrite(line, 3 * image->width, 1, fd) != 1) {
-                ERROR2("couldn't write line '%d'.", j);
+                ERROR("couldn't write line '%d'.", j);
                 error_p = 1;
                 break;
             }
@@ -117,7 +117,7 @@ void image_save_targa(image_t *image, FILE *fd)
     {
         int8_t footer[26] = "TRUEVISION-XFILE";
         if (fwrite(footer, 26, 1, fd) != 1) {
-            ERROR1("couldn't write footer.");
+            ERROR("couldn't write footer.");
         }
     }
 }

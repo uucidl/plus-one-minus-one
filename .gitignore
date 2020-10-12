@@ -1,4 +1,6 @@
 *.o
+*.d
 *.elf
+*~
 tundra-output
 .tundra*

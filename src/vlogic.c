@@ -11,7 +11,7 @@
 
 #include "vlogic.h"
 
-#include <log4c.h>
+#include <logging.h>
 
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_VLOGIC);
 
@@ -87,7 +87,7 @@ static void vlogic_set_multiplier(vlogic_t *self, unsigned int i,
         self->ny = nny;
     } break;
     default:
-        ERROR1("invalid multiplier index");
+        ERROR("invalid multiplier index");
     }
 }
 

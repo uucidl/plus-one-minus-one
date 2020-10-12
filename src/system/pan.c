@@ -13,7 +13,7 @@
 #include <scripting/dictionary.h>
 #include "pan_driver.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_PAN);
 
 static pan_driver_t *driver = 0;
@@ -35,7 +35,7 @@ int pan_open(const char *driver_name, const char *device, int sample_rate)
         driver = map_value_obtain(pp_d);
         ret = driver->new (driver, device, sample_rate);
     } else {
-        WARNING2("driver '%s' not found.", driver_name);
+        WARNING("driver '%s' not found.", driver_name);
     }
 
     return ret;

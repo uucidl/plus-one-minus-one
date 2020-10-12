@@ -12,7 +12,7 @@
 
 #include <messaging/receiver.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_MESSAGING_RECEIVER);
 
 #include <libc/stdlib.h>
@@ -39,7 +39,7 @@ static message_fifo_t *add_fifo(receiver_t *self, atom_t a)
 {
     message_fifo_t *fifo = get_fifo(self, a);
 
-    TRACE2("adding fifo: '%s'\n", atom_get_cstring_value(a));
+    TRACE("adding fifo: '%s'\n", atom_get_cstring_value(a));
     if (!fifo) {
         fifo = message_fifo_instantiate_toplevel(NULL);
         fifo->atom = a;
@@ -129,12 +129,12 @@ static void receiver_eval_pending(receiver_t *self, atom_t selector,
     node_iterator_t it;
 
     if (fifo == NULL) {
-        WARNING2("fifo for selector '%s' inexistant.",
+        WARNING("fifo for selector '%s' inexistant.",
                  atom_get_cstring_value(selector));
         return;
     }
 
-    TRACE2("eval_pending for fifo: '%s'", atom_get_cstring_value(fifo->atom));
+    TRACE("eval_pending for fifo: '%s'", atom_get_cstring_value(fifo->atom));
     if (fifo->end == NULL) {
         return;
     }
@@ -142,7 +142,7 @@ static void receiver_eval_pending(receiver_t *self, atom_t selector,
     if (get_node_iterator_end(fifo, &it)) {
         message_node_t *current;
         while ((current = node_iterator_prev(&it))) {
-            TRACE2("current: %f", current->context->ms);
+            TRACE("current: %f", current->context->ms);
             if (!current->dispatched_p) {
                 if (current->context->is_in(current->context, context)) {
                     self->eval(self, current->bytecodes, current->context);
@@ -177,7 +177,7 @@ static message_node_t *receiver_peek_pending(receiver_t *self, atom_t selector,
     message_node_t *head = NULL;
 
     if (fifo == NULL) {
-        WARNING2("fifo for selector '%s' inexistant.",
+        WARNING("fifo for selector '%s' inexistant.",
                  atom_get_cstring_value(selector));
         return NULL;
     } else if (fifo->end == NULL) {
@@ -187,7 +187,7 @@ static message_node_t *receiver_peek_pending(receiver_t *self, atom_t selector,
     if (get_node_iterator_end(fifo, &it)) {
         message_node_t *current;
         while ((current = node_iterator_prev(&it))) {
-            TRACE2("ms: %f.", current->context->ms);
+            TRACE("ms: %f.", current->context->ms);
             if (!current->dispatched_p &&
                 current->context->is_in(current->context, context)) {
                 head = current;
@@ -232,7 +232,7 @@ static void receiver_receive(receiver_t *self, bytecode_stream_t *message,
     node_iterator_t it;
 
     if (!message || !message->end) {
-        WARNING1("message === NULL");
+        WARNING("message === NULL");
         return;
     }
 
@@ -260,31 +260,31 @@ static void receiver_receive(receiver_t *self, bytecode_stream_t *message,
         message_node_t *current = NULL;
         message_node_t *last = NULL;
 
-        TRACE3("adding at: %f in fifo: %s", context->ms,
+        TRACE("adding at: %f in fifo: %s", context->ms,
                atom_get_cstring_value(fifo->atom));
 
         while ((current = node_iterator_next(&it)) &&
                context->is_in(context, current->context)) {
             /* advance until context is not anymore in current context */
-            TRACE2("current at: %f", current->context->ms);
+            TRACE("current at: %f", current->context->ms);
             last = current;
         }
 
         if (last == NULL) {
             if (fifo->end == NULL) {
-                TRACE1("append to empty fifo");
+                TRACE("append to empty fifo");
                 node->next = node;
                 node->prev = node;
                 fifo->end = node;
             } else {
                 if (context->is_in(context, current->context)) {
-                    TRACE2("insert after current at %f", current->context->ms);
+                    TRACE("insert after current at %f", current->context->ms);
                     node->prev = current;
                     node->next = current->next;
                     current->next = node;
                     node->next->prev = node;
                 } else {
-                    TRACE2("insert before current at %f", current->context->ms);
+                    TRACE("insert before current at %f", current->context->ms);
                     node->next = current;
                     node->prev = current->prev;
                     current->prev = node;
@@ -295,13 +295,13 @@ static void receiver_receive(receiver_t *self, bytecode_stream_t *message,
             }
         } else {
             if (context->is_in(context, last->context)) {
-                TRACE2("insert after last at %f", last->context->ms);
+                TRACE("insert after last at %f", last->context->ms);
                 node->prev = last;
                 node->next = last->next;
                 last->next = node;
                 node->next->prev = node;
             } else {
-                TRACE2("insert before last at %f", last->context->ms);
+                TRACE("insert before last at %f", last->context->ms);
                 node->next = last;
                 node->prev = last->prev;
                 last->prev = node;

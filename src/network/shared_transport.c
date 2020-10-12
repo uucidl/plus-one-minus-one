@@ -10,7 +10,7 @@
  * full acceptance and understanding.
  * e 158 */
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_NETWORK_SHARED_TRANSPORT);
 
 #include <lib/chance.h>
@@ -43,7 +43,7 @@ static pthread_mutex_t channel_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int channel_cache_init()
 {
     if (pthread_mutex_lock(&channel_cache_mutex)) {
-        ERROR1("error, lock channel cache");
+        ERROR("error, lock channel cache");
     }
 
     if (!channel_cache_init_p) {
@@ -55,7 +55,7 @@ static int channel_cache_init()
             cached_channel_t *cs = add_element(&channel_cache);
 
             if (pthread_mutex_init(&cs->channel_mutex, NULL)) {
-                ERROR1("channel mutex init failed");
+                ERROR("channel mutex init failed");
             }
 
             sock_stream_instantiate_toplevel(&cs->channel.stream);
@@ -113,10 +113,10 @@ static cached_channel_t *channel_cache_get_channel()
             ret = iterator_next(&it);
         } while (n-- && ret);
         if (!ret)
-            ERROR1("bug, couln't find a cached_channel to wait on");
+            ERROR("bug, couln't find a cached_channel to wait on");
 
         if (pthread_mutex_lock(&ret->channel_mutex)) {
-            ERROR1("locking channel_mutex");
+            ERROR("locking channel_mutex");
         }
     }
 
@@ -164,7 +164,7 @@ static void channel_cache_release_channel(cached_channel_t *cs)
     int err;
 
     if ((err = pthread_mutex_unlock(&cs->channel_mutex))) {
-        ERROR1("error unlocking channel_mutex");
+        ERROR("error unlocking channel_mutex");
     }
 }
 
@@ -233,7 +233,7 @@ static void remove_entry(shared_transport_t *self, channel_entry_t *e)
     entry_iterator_t it;
 
     if (!self->end) {
-        WARNING1("empty. nothing to remove");
+        WARNING("empty. nothing to remove");
         return;
     }
 
@@ -256,7 +256,7 @@ static void remove_entry(shared_transport_t *self, channel_entry_t *e)
             prev->next = current->next;
         }
     } else {
-        WARNING1("entry not found.");
+        WARNING("entry not found.");
     }
 }
 
@@ -302,14 +302,14 @@ static void ts_register_channel(selector_t *zelf, channel_t *channel,
                 break;
         }
         if (i == FD_SETSIZE)
-            ERROR1("selector full.");
+            ERROR("selector full.");
         else {
             self->channels[i] = channel;
             self->cbs[i] = cb;
             self->activated_ms[i] = get_milliseconds();
         }
     } else {
-        WARNING1("socket was already set.");
+        WARNING("socket was already set.");
     }
     pthread_mutex_unlock(&self->mutex);
 }
@@ -375,9 +375,9 @@ static void *ts_run(selector_t *zelf)
 
         if (n == 0) {
             /* no active fds around anymore, let's not eat cpu time */
-            TRACE1("waiting for new fd");
+            TRACE("waiting for new fd");
             pthread_cond_wait(&self->first_fd_registered, &self->mutex);
-            TRACE1("done");
+            TRACE("done");
             n = self->n;
         }
 
@@ -453,7 +453,7 @@ static void *ts_run(selector_t *zelf)
                     if (FD_ISSET(stream->socket, &self->fds)) {
                         /* if not set, check expiration */
                         if (t - self->activated_ms[i] > 5000.0) {
-                            TRACE3("%d (%s) slept for over 5sec",
+                            TRACE("%d (%s) slept for over 5sec",
                                    stream->socket, c->stream.url.server);
                             c->stream.broken_p = 1;
                             internal_unregister_channel(zelf, c);
@@ -468,7 +468,7 @@ static void *ts_run(selector_t *zelf)
         }
     }
 
-    TRACE1("stopping selector");
+    TRACE("stopping selector");
     pthread_exit(NULL);
 }
 
@@ -500,7 +500,7 @@ static tselector_t *tselector_instantiate(tselector_t *x)
 
         if (kn_thread_create_minimum_priority_with_attributes(
                 &id, &attr, ts_pthread_run, ts)) {
-            ERROR1("error in pthread_create");
+            ERROR("error in pthread_create");
         }
 
         pthread_attr_destroy(&attr);
@@ -521,7 +521,7 @@ static channel_t *transport_connect_to(transport_t *zelf, url_t *url,
 
     {
         char *url_s = url->create_string(url);
-        TRACE2("connect_to: %s", url_s);
+        TRACE("connect_to: %s", url_s);
         free(url_s);
     }
 
@@ -584,10 +584,10 @@ static void transport_release(transport_t *zelf, channel_t *channel)
         if (ce->pair)
             channel_cache_release_channel(ce->pair);
         else
-            DEBUG1("pair was null.");
+            DEBUG("pair was null.");
         free(ce);
     } else {
-        WARNING2("removing an entry that was not found? (socket: %d)",
+        WARNING("removing an entry that was not found? (socket: %d)",
                  channel->stream.socket);
     }
 
@@ -624,7 +624,7 @@ shared_transport_t *shared_transport_instantiate(shared_transport_t *x)
     channel_cache_init();
 
     if (pthread_mutex_init(&s->entries_mutex, NULL)) {
-        ERROR1("failed mutex_init_channel");
+        ERROR("failed mutex_init_channel");
     }
 
     s->super.connect_to = transport_connect_to;

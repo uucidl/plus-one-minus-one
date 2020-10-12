@@ -12,21 +12,13 @@
 #ifndef KNOS_MESSAGING_CLASS_H
 #define KNOS_MESSAGING_CLASS_H
 
+#include <scripting/atom.h>
+
 /*
-  a class is an entity regrouping objects accepting
-  the same messages.
+  a class is an entity regrouping objects of similar kinds.
 */
-
-#include <messaging/router.h>
-
 typedef struct class_t {
     atom_t class;     /* this class' atom  */
-    router_t *router; /* class wide router */
-
-    /* attach this receiver to the class router, and returns
-       the instance id for it. */
-    atom_t (*attach_instance)(struct class_t *self, receiver_t *receiver);
-
     unsigned int next_instance; /* serial number -used to generate atoms */
 } class_t;
 

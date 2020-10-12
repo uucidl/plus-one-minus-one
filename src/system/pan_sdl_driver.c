@@ -27,7 +27,7 @@ typedef struct pan_sdl_driver_t {
 
 CLASS_INHERIT(pan_sdl_driver, pan_driver);
 
-static void SDL_AudioCallback(void *userdata, Uint8 *stream, int len)
+static void audio_callback(void *userdata, Uint8 *stream, int len)
 {
     pan_sdl_driver_t *self = userdata;
 
@@ -72,7 +72,7 @@ static int pan_sdl_new(struct pan_driver_t *zelf, const char *device,
     desired.format = AUDIO_S16SYS;
     desired.channels = 2;
     desired.samples = 4096;
-    desired.callback = SDL_AudioCallback;
+    desired.callback = audio_callback;
     desired.userdata = self;
 
     if (SDL_OpenAudio(&desired, &self->spec) < 0) {

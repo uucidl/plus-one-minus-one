@@ -12,7 +12,7 @@
 
 #include <messaging/dispatcher.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_MESSAGING_DISPATCHER);
 
 #include <scripting/dictionary.h>
@@ -43,7 +43,7 @@ static void gcc_dispatch(dispatcher_t *self, context_t *context,
     int n;
 
     if (!message || !message->end) {
-        WARNING1("message === null");
+        WARNING("message === null");
         return;
     }
 
@@ -55,10 +55,10 @@ static void gcc_dispatch(dispatcher_t *self, context_t *context,
     d = self->definitions.get_desc(&self->definitions, message->end->code.verb);
     if (!d) {
         if (message->end->code.adverb == atom_atom)
-            WARNING2("description not found for verb '%s'",
+            WARNING("description not found for verb '%s'",
                      atom_get_cstring_value(message->end->code.verb));
         else
-            WARNING2("description not found for bytecode '%x'",
+            WARNING("description not found for bytecode '%x'",
                      (unsigned int)message->end->code.verb);
         return;
     }
@@ -77,7 +77,7 @@ static void gcc_dispatch(dispatcher_t *self, context_t *context,
     stack_argsize += 4; // for final context object
 
     if (n < d->arg_number) {
-        WARNING1("insufficient argument number.");
+        WARNING("insufficient argument number.");
         return;
     }
 
@@ -103,7 +103,8 @@ static void gcc_dispatch(dispatcher_t *self, context_t *context,
         arg_int[0] = (int)context->object;
     }
 
-    ret = __builtin_apply(d->function, argframe, stack_argsize);
+    typedef void (*anyfn)();
+    ret = __builtin_apply((anyfn)d->function, argframe, stack_argsize);
     if (argframe->arg_ptr)
         free(argframe->arg_ptr);
     free(argframe);
@@ -124,7 +125,7 @@ static void libffi_dispatch(dispatcher_t *self, context_t *context,
     atom_t selector = 0;
 
     if (!message || !message->end) {
-        WARNING1("message === null");
+        WARNING("message === null");
         return;
     }
 
@@ -134,10 +135,10 @@ static void libffi_dispatch(dispatcher_t *self, context_t *context,
             ->get_desc((definitions_t *)&self->definitions, selector);
     if (!d) {
         if (message->end->code.adverb == atom_atom)
-            WARNING2("description not found for verb '%s'",
+            WARNING("description not found for verb '%s'",
                      atom_get_cstring_value(message->end->code.verb));
         else
-            WARNING2("description not found for bytecode '%x'",
+            WARNING("description not found for bytecode '%x'",
                      (unsigned int)selector);
         return;
     }
@@ -169,7 +170,7 @@ static void libffi_dispatch(dispatcher_t *self, context_t *context,
             arguments[n++] = &b->verb;
         }
         if (n != d->arg_number + 1)
-            WARNING4("selector: '%s', not enough arguments. (found %d / %d) "
+            WARNING("selector: '%s', not enough arguments. (found %d / %d) "
                      "Calling anyway.",
                      atom_get_cstring_value(selector), n - 1, d->arg_number);
 
@@ -177,7 +178,7 @@ static void libffi_dispatch(dispatcher_t *self, context_t *context,
 
         {
             void *rvalue = malloc(8);
-            TRACE1("calling function.");
+            TRACE("calling function.");
             ffi_call(&((ffi_desc_t *)d)->cif, (void *)d->function, rvalue,
                      (void **)&arguments);
             free(rvalue);

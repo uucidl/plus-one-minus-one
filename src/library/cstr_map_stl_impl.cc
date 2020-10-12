@@ -19,6 +19,7 @@ extern "C" {
 }
 
 #include <unordered_map>
+#include <cstring>
 
 struct eqstr {
     bool operator()(const char *s1, const char *s2) const

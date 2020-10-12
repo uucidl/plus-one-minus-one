@@ -17,7 +17,7 @@
 #include "demo.h"
 #include "effect.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM);
 
 #include "kgo.h"
@@ -35,8 +35,8 @@ static void *videobuffer = NULL;
 
 void ptc_cleanup_callback(void)
 {
-    INFO1("done.");
-    DEBUG2("total time: %f\n", demo->current_ms);
+    INFO("done.");
+    DEBUG("total time: %f\n", demo->current_ms);
 
     free(videobuffer);
 
@@ -56,28 +56,28 @@ int default_main_loop(demo_t *d)
     if (!demo->nosound) {
         if (!pan_open(PAN_DEFAULT, demo->audio_device,
                       demo->audio_sample_rate)) {
-            ERROR1("audio: cannot open.");
+            ERROR("audio: cannot open.");
             return 1;
         }
     } else {
-        INFO1("audio: no sound mode.");
+        INFO("audio: no sound mode.");
         pan_open("null", demo->audio_device, demo->audio_sample_rate);
     }
 
     if (!pan_configure_demo(demo)) {
-        ERROR1("couldn't configure demo.");
+        ERROR("couldn't configure demo.");
         return 1;
     }
 
     if (!kgo_open(KGO_DEFAULT, demo->title, demo->video_width,
                   demo->video_height)) {
-        ERROR1("video: cannot open.");
+        ERROR("video: cannot open.");
 
         return 1;
     }
 
     if (!kgo_configure_demo(demo)) {
-        ERROR1("couldn't configure demo.");
+        ERROR("couldn't configure demo.");
         return 1;
     }
 
@@ -89,7 +89,7 @@ int default_main_loop(demo_t *d)
 
     if (demo->midi_p) {
         if (!midi_open()) {
-            ERROR1("couldn't configure midi.");
+            ERROR("couldn't configure midi.");
             return 1;
         }
         demo->set_midi_event_listener(demo, midi_get_event_listener());

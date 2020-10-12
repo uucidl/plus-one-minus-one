@@ -9,7 +9,7 @@
  * full acceptance and understanding.
  * e 924 */
 
-#include <log4c.h>
+#include <logging.h>
 
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_LIB_URL_OPEN);
 
@@ -53,7 +53,7 @@ stream_t *knos_demos_lib_url_open2(const url_t *url, const char *mode)
 
         f = loaders->get_fopen(loaders, url->protocol);
         if (f == NULL) {
-            ERROR2("protocol '%s' not supported.", url->protocol);
+            ERROR("protocol '%s' not supported.", url->protocol);
             return NULL;
         } else {
             char filepath[(url->server ? strlen(url->server) : 0) + 1 +

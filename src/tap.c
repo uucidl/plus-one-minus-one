@@ -11,7 +11,7 @@
 
 #include "tap.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_TAP);
 
 #include <libc/stdlib.h>
@@ -80,7 +80,7 @@ static void tapout_wraparound(tapout_t *self)
         unsigned int phase = self->out_phase;
         self->out_phase %= self->tapin->line_size;
         if (phase != self->out_phase)
-            DEBUG1("wrap-around done.");
+            DEBUG("wrap-around done.");
     }
 }
 

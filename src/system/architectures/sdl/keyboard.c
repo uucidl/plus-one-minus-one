@@ -19,7 +19,7 @@ static map_t keyMap;
 
 static int init_p = 1;
 
-static void define(const char *name, SDLKey key)
+static void define(const char *name, SDL_Keycode key)
 {
     dictionary_t *dictionary = dictionary_get_instance();
     keyMap.put(&keyMap, key, (void *)dictionary->new_atom(dictionary, name));
@@ -35,7 +35,7 @@ static void initialize_keyMap()
     define("clear", SDLK_CLEAR);
     define("return", SDLK_RETURN);
     // define ("pause", );
-    define("scroll-lock", SDLK_SCROLLOCK);
+    define("scroll-lock", SDLK_SCROLLLOCK);
     define("sys-req", SDLK_SYSREQ);
     define("escape", SDLK_ESCAPE);
     define("delete", SDLK_DELETE);
@@ -57,8 +57,6 @@ static void initialize_keyMap()
     define("right-shift", SDLK_RSHIFT);
     define("left-control", SDLK_LCTRL);
     define("right-control", SDLK_RCTRL);
-    define("left-meta", SDLK_LMETA);
-    define("right-meta", SDLK_RMETA);
     define("left-alt", SDLK_LALT);
     define("right-alt", SDLK_RALT);
 
@@ -80,7 +78,6 @@ static atom_t char_atom;
 void sdl_keyboard_initialize()
 {
     if (init_p) {
-        SDL_EnableUNICODE(1);
         initialize_keyMap();
         char_atom = dictionary_get_instance()->new_atom(
             dictionary_get_instance(), "char");
@@ -89,7 +86,7 @@ void sdl_keyboard_initialize()
     }
 }
 
-atom_t sdl_keysym_to_symbol(SDL_keysym keysym)
+atom_t sdl_keysym_to_symbol(SDL_Keysym keysym)
 {
     map_value_t value = keyMap.get(&keyMap, keysym.sym);
     if (map_value_is_there(value)) {
@@ -97,10 +94,4 @@ atom_t sdl_keysym_to_symbol(SDL_keysym keysym)
     } else {
         return char_atom;
     }
-}
-
-int sdl_keysym_to_ascii(SDL_keysym keysym)
-{
-    return keysym.unicode & 0xff;
-    ;
 }

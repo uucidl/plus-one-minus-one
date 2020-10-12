@@ -46,7 +46,7 @@ typedef struct kgo_disk_driver_t {
 
 CLASS_INHERIT(kgo_disk_driver, kgo_driver);
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_KGO_DISK_DRIVER);
 
 static int kgo_disk_driver_new(kgo_driver_t *zelf, char *title,
@@ -133,7 +133,7 @@ static int kgo_disk_driver_configure_demo(kgo_driver_t *zelf, demo_t *demo)
             /* adapt an opengl effect to the driver */
             self->subdriver = kgo_get_driver(opengl_frame_type);
             if (!self->subdriver) {
-                ERROR1("couldn't find an opengl driver to use");
+                ERROR("couldn't find an opengl driver to use");
                 return 0;
             }
 
@@ -147,12 +147,12 @@ static int kgo_disk_driver_configure_demo(kgo_driver_t *zelf, demo_t *demo)
             effect_t *effect = demo->kgo_effect_root;
 
             if (!adapter->super.super.new(&adapter->super.super)) {
-                ERROR1("couldn't create video adapter for opengl effect.");
+                ERROR("couldn't create video adapter for opengl effect.");
                 return 0;
             }
 
             if (!effect->new (effect)) {
-                ERROR1("couldn't create opengl effect.");
+                ERROR("couldn't create opengl effect.");
                 return 0;
             }
 

@@ -15,7 +15,7 @@
    midi null driver
 */
 
-#include <log4c.h>
+#include <logging.h>
 // LOG_NEW_DEFAULT_SUBCATEGORY(MIDI, KNOS_DEMOS_SYSTEM);
 
 static int midi_running_p;

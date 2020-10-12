@@ -20,7 +20,7 @@
 #include <system/opengl_effect.h>
 #include <system/opengl_adapter.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_KGO_SDLGL_DRIVER);
 
 typedef struct kgo_sdlgl_driver_t {
@@ -38,6 +38,8 @@ typedef struct kgo_sdlgl_driver_t {
 
     int has_adapter_p;
 
+    SDL_Window *window;
+  
 #ifdef LINUX
     Display *x11_display;
     Window x11_window;
@@ -61,9 +63,9 @@ static void setupWIN32(kgo_sdlgl_driver_t *self)
     HWND hWnd;
 
     SDL_VERSION(&(info.version));
-    r = SDL_GetWMInfo(&info);
+    r = SDL_GetWindowWMInfo(self->window, &info);
     if (r < 0) {
-        ERROR2("Error setting up WIN32 specifics: '%s'\n", SDL_GetError());
+        ERROR("Error setting up WIN32 specifics: '%s'\n", SDL_GetError());
         return;
     }
     hWnd = info.window;
@@ -83,16 +85,14 @@ static void setupLINUX(kgo_sdlgl_driver_t *self)
     SDL_SysWMinfo info;
 
     SDL_VERSION(&(info.version));
-    r = SDL_GetWMInfo(&info);
+    r = SDL_GetWindowWMInfo(self->window, &info);
     if (r < 0) {
-        ERROR2("Error setting up WIN32 specifics: '%s'\n", SDL_GetError());
+        ERROR("Error getting Linux specifics: '%s'\n", SDL_GetError());
         return;
     }
 
-    info.info.x11.lock_func();
     self->x11_display = info.info.x11.display;
     self->x11_window = info.info.x11.window;
-    info.info.x11.unlock_func();
 
     SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 }
@@ -127,66 +127,44 @@ static int kgo_sdlgl_driver_new(kgo_driver_t *zelf, char *title,
                                 unsigned int width, unsigned int height)
 {
     kgo_sdlgl_driver_t *self = (kgo_sdlgl_driver_t *)zelf;
-    int ok = 1;
-    int flags = SDL_OPENGL;
-    int bpp;
-    const SDL_VideoInfo *info = NULL;
 
-    ok = SDL_Init(SDL_INIT_VIDEO) == 0;
-    if (ok) {
-        atexit(SDL_Quit);
-
-        if (self->windowed_p) {
-            SDL_WM_SetCaption(title, NULL);
-        } else {
-            flags |= SDL_FULLSCREEN;
-            SDL_ShowCursor(0);
-        }
-
-        info = SDL_GetVideoInfo();
-        ok = !!info;
-        if (ok) {
-            bpp = info->vfmt->BitsPerPixel;
-            if (bpp == 32) {
-                SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-                SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-                SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-            } else {
-                SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-                SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-                SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-            }
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-            /* opengl can scale, thus the real window size will probably
-               come from the user.
-            */
-            self->window_width = width;
-            self->window_height = height;
-
-            if (self->window_width < 640) {
-                self->window_width = 640;
-                self->window_height = self->window_width * height / width;
-            }
-
-            self->width = width;
-            self->height = height;
-
-            ok = !!SDL_SetVideoMode(self->window_width, self->window_height,
-                                    bpp, flags);
-
-#ifdef WIN32
-            setupWIN32(self);
-#elif defined(LINUX)
-            setupLINUX(self);
-#elif defined(MACOSX)
-            setupMACOSX(self);
-#endif
-        }
+    /* opengl can scale, thus the real window size will probably
+       come from the user.
+    */
+    self->window_width = width;
+    self->window_height = height;
+    
+    if (self->window_width < 640) {
+      self->window_width = 640;
+      self->window_height = self->window_width * height / width;
+    }
+    
+    self->width = width;
+    self->height = height;
+    
+    int ok = SDL_Init(SDL_INIT_VIDEO) == 0;
+    if (!ok) {
+      return 0;
     }
 
-    return ok;
+    atexit(SDL_Quit);
+
+    self->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, self->window_width, self->window_height, SDL_WINDOW_OPENGL | (self->windowed_p? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP));
+    if (!self->window) {
+      return 0;
+    }
+
+    SDL_GLContext glcontext = SDL_GL_CreateContext(self->window);
+
+#ifdef WIN32
+    setupWIN32(self);
+#elif defined(LINUX)
+    setupLINUX(self);
+#elif defined(MACOSX)
+    setupMACOSX(self);
+#endif
+
+    return 1;
 }
 
 extern void ptc_cleanup_callback(void);
@@ -196,6 +174,9 @@ static int kgo_sdlgl_driver_destroy(struct kgo_driver_t *self)
     SDL_ShowCursor(1);
     SDL_Quit();
 
+    // @todo remove gl context here.
+    //SDL_GL_DeleteContext(glcontext);      
+    
     return 1;
 }
 
@@ -235,12 +216,12 @@ static int process_events(kgo_driver_t *zelf, int event_pending)
 {
     kgo_sdlgl_driver_t *self = (kgo_sdlgl_driver_t *)zelf;
     SDL_Event sdl_event;
-    unsigned char *keypressed;
+    unsigned char const *keypressed;
 
     while (SDL_PollEvent(&sdl_event)) {
         switch (sdl_event.type) {
         case SDL_KEYDOWN: {
-            keypressed = SDL_GetKeyState(NULL);
+            keypressed = SDL_GetKeyboardState(NULL);
             if (keypressed[SDLK_ESCAPE] == SDL_PRESSED) {
                 self->demo->running_p = 0;
             }
@@ -272,7 +253,7 @@ static void kgo_sdlgl_driver_update(struct kgo_driver_t *zelf, void *buffer,
         frame.output_frame = NULL;
         converter->computes(converter, &frame, 0.0);
     }
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(self->window);
     process_events(zelf, event_pending);
 }
 
@@ -311,7 +292,7 @@ static int kgo_sdlgl_driver_configure_demo(kgo_driver_t *zelf, demo_t *demo)
             effect_t *effect = demo->kgo_effect_root;
 
             if (!adapter->super.super.new(&adapter->super.super)) {
-                ERROR1("couldn't create opengl adapter for video effect.");
+                ERROR("couldn't create opengl adapter for video effect.");
                 return 0;
             }
 
@@ -320,18 +301,18 @@ static int kgo_sdlgl_driver_configure_demo(kgo_driver_t *zelf, demo_t *demo)
             self->has_adapter_p = 1;
 
             if (!effect->new (effect)) {
-                ERROR1("couldn't create video effect.");
+                ERROR("couldn't create video effect.");
                 return 0;
             }
         } else if (frame_type == dict->get_atom(dict, OPENGL_FRAME_TYPE_NAME)) {
             effect_t *effect = demo->kgo_effect_root;
 
             if (!effect->new (effect)) {
-                ERROR1("couldn't create video effect.");
+                ERROR("couldn't create video effect.");
                 return 0;
             }
         } else {
-            ERROR2("video effect has invalid frame type: %s",
+            ERROR("video effect has invalid frame type: %s",
                    atom_get_cstring_value(frame_type));
             error_p = 1;
         }

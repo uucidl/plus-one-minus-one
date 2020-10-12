@@ -23,7 +23,7 @@
 #include <system/demo.h>
 #include <library/memory.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_TRAFFIC);
 
 #include <library/thread-helper.h>
@@ -131,7 +131,7 @@ void *fetch_image(void *rg)
                     continue;
                 }
 
-                TRACE3("opening %d - %s", arg->spot, url);
+                TRACE("opening %d - %s", arg->spot, url);
                 {
                     char *url_s;
                     if (0 == strncmp("http://", url, strlen("http://"))) {
@@ -148,11 +148,11 @@ void *fetch_image(void *rg)
 
                     if (!stream) {
                         err = 1;
-                        TRACE1("couldn't fetch from the internet");
+                        TRACE("couldn't fetch from the internet");
                     } else {
                         if (!add_to_projector(stream)) {
                             err = 1;
-                            TRACE1("couldn't add to projector");
+                            TRACE("couldn't add to projector");
                         } else if (freeze_datafiles_p) {
                             int n = arg->spot;
                             int i = 1;
@@ -178,7 +178,7 @@ void *fetch_image(void *rg)
                                         (n = stream_get_callbacks(stream)->read(
                                              data, 1, 4096, stream))) {
                                         if (1 != fwrite(data, n, 1, fd)) {
-                                            ERROR2("couldn't write to %s",
+                                            ERROR("couldn't write to %s",
                                                    filename);
                                         }
                                     }
@@ -196,13 +196,13 @@ void *fetch_image(void *rg)
             } while (err && n_err++ < 10);
 
             if (!err) {
-                TRACE2("done with %d", arg->spot);
+                TRACE("done with %d", arg->spot);
             } else {
-                TRACE2("error with %d", arg->spot);
+                TRACE("error with %d", arg->spot);
             }
         }
     } else {
-        DEBUG1("fetcher was null.");
+        DEBUG("fetcher was null.");
     }
 
     free(arg);
@@ -223,7 +223,7 @@ static void *fetch_google(void *rg)
                              "off&start=0&sa=N&filter=0";
 
         if (!arg->source)
-            DEBUG1("source was null");
+            DEBUG("source was null");
         else {
             char *query = malloc(strlen(arg->source) + strlen(cquery));
 
@@ -233,7 +233,7 @@ static void *fetch_google(void *rg)
 
             hstream->url.new(&hstream->url, query);
 
-            TRACE2("opening query: %s", query);
+            TRACE("opening query: %s", query);
 
             if (hstream->open(hstream)) {
                 fetcher->parse_links(fetcher, hstream, 0);
@@ -261,7 +261,7 @@ static void *fetch_google(void *rg)
         }
         free(fetcher);
     } else {
-        DEBUG1("fetcher was null");
+        DEBUG("fetcher was null");
     }
 
     pthread_mutex_lock(&arg->complete_mutex);
@@ -284,7 +284,7 @@ static void *fetch_directory(void *rg)
         fetcher->callback = http_directory_callback;
 
         if (!arg->source)
-            DEBUG1("source was null");
+            DEBUG("source was null");
         else {
             hstream->url.new(&hstream->url, arg->source);
             hstream = hstream->open(hstream);
@@ -315,7 +315,7 @@ static void *fetch_directory(void *rg)
 
         free(fetcher);
     } else {
-        DEBUG1("fetcher was null");
+        DEBUG("fetcher was null");
     }
 
     pthread_mutex_lock(&arg->complete_mutex);
@@ -443,7 +443,7 @@ void start_grabbing_images(int max_images)
                             if (kn_thread_create(
                                     &parsing_threads_ids[thread_count],
                                     fetching_function, arg)) {
-                                ERROR1("error in pthread_create");
+                                ERROR("error in pthread_create");
                             } else {
                                 thread_count++;
                             }
@@ -477,7 +477,7 @@ void start_grabbing_images(int max_images)
         height = demo_get_instance()->video_height;
         videobuffer = calloc(sizeof(uint32_t), width * height);
 
-        TRACE2("waiting for %d threads.", thread_count);
+        TRACE("waiting for %d threads.", thread_count);
         /* wait for parsers to return */
         if (thread_count > 0) {
             unsigned int *times = calloc(thread_count, sizeof(unsigned int));
@@ -485,7 +485,7 @@ void start_grabbing_images(int max_images)
             n = thread_count;
             while (n) {
                 double p = 1000.0 / n;
-                TRACE2("threads still left: %d", n);
+                TRACE("threads still left: %d", n);
                 for (i = 0; i < thread_count; i++) {
                     int status = 0;
                     struct timespec timeout;
@@ -497,7 +497,7 @@ void start_grabbing_images(int max_images)
                     if (!parsing_threads_args[i])
                         continue;
 
-                    TRACE2("waiting for '%d'", parsing_threads_ids[i]);
+                    TRACE("waiting for '%d'", parsing_threads_ids[i]);
                     {
                         int h_block = height / thread_count;
                         uint32_t *scanline = videobuffer + i * width * h_block;
@@ -517,7 +517,7 @@ void start_grabbing_images(int max_images)
                             &parsing_threads_args[i]->complete_cond,
                             &parsing_threads_args[i]->complete_mutex, &timeout);
                     if (status) {
-                        TRACE1("got completion message");
+                        TRACE("got completion message");
                         pthread_mutex_unlock(
                             &parsing_threads_args[i]->complete_mutex);
                         pthread_join(parsing_threads_ids[i], NULL);
@@ -547,9 +547,9 @@ void start_grabbing_images(int max_images)
                             demo_get_instance()->update(demo_get_instance(),
                                                         videobuffer);
                         }
-                        TRACE2("thread: %d completed.", parsing_threads_ids[i]);
+                        TRACE("thread: %d completed.", parsing_threads_ids[i]);
                     } else {
-                        TRACE1("timedout");
+                        TRACE("timedout");
                         pthread_mutex_unlock(
                             &parsing_threads_args[i]->complete_mutex);
                         times[i]++;
@@ -582,7 +582,7 @@ void start_grabbing_images(int max_images)
     pthread_mutex_unlock(&fetcher->collected_urls_mutex);
 
     if (n > 0) {
-        TRACE2("fetching %d images.", max_images);
+        TRACE("fetching %d images.", max_images);
         for (i = 0; i < max_images; i++) {
             thread_arg_t *arg;
             pthread_t id;
@@ -593,7 +593,7 @@ void start_grabbing_images(int max_images)
             arg->fetcher = fetcher;
 
             if (kn_thread_create_background(&id, fetch_image, arg)) {
-                ERROR1("error in pthread_create");
+                ERROR("error in pthread_create");
             }
         }
     }

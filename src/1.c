@@ -21,7 +21,7 @@
 #include <SDL.h>
 #endif
 
-#include <log4c.h>
+#include <logging.h>
 
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1);
 
@@ -36,8 +36,8 @@ static char *frame_url = "virtual://resources/dat/frame.png";
 static char *font_url = "virtual://resources/dat/RopaSans-Regular.otf";
 #endif
 
-    // network enabled by default
-    static int network_p = 1;
+// network enabled by default
+static int network_p = 1;
 
 #include <lib/chance.h>
 #include <system/demo.h>
@@ -47,6 +47,8 @@ static char *font_url = "virtual://resources/dat/RopaSans-Regular.otf";
 
 #include <lib/pixel.h>
 #include <lib/url_open.h>
+
+#include <libc/assert.h>
 #include <libc/math.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
@@ -91,7 +93,7 @@ int add_to_projector(stream_t *stream)
     pthread_mutex_lock(&projector_mutex);
 #ifndef NDEBUG
     if (next_image_n >= IMAGES_N) {
-        ERROR1("PRECONDITION: trying to add more images than we can hold!");
+        ERROR("PRECONDITION: trying to add more images than we can hold!");
         return 0;
     }
 #endif
@@ -146,9 +148,12 @@ sample_t *buffer = NULL;
 
 sample_t global_amp = 1.0f;
 
-static void rub_callback(void *self, int length, context_t *context)
+static void rub_callback(context_t *context, bytecode_stream_t* stream)
 {
-    if (context)
+  assert(stream->get_count(stream) == 1);
+  int length = atom_get_integer_value(stream->pop(stream)->verb);
+
+  if (context)
         rub_ms = context->ms;
     rub_length = length;
 
@@ -178,18 +183,21 @@ static void rub_callback(void *self, int length, context_t *context)
     }
 }
 
-static void ice_callback(void *self, context_t *context)
+static void ice_callback(context_t *context, bytecode_stream_t* unused)
 {
     if (context)
         ice_ms = context->ms;
     else
-        DEBUG1(__FILE__ ": no context");
+        DEBUG(__FILE__ ": no context");
 }
 
-static void ice_alpha_callback(icefx_t *self, unsigned int alpha,
-                               context_t *context)
+static void ice_alpha_callback(context_t *context, bytecode_stream_t *message)
 {
-    self->alpha = alpha;
+  assert(message->get_count(message) == 1);
+  unsigned int alpha = atom_get_integer_value(message->pop(message)->verb);
+
+  icefx_t *self = context->object;
+  self->alpha = alpha;
 }
 
 /*--- ui event processing ---*/
@@ -200,16 +208,18 @@ static void switch_stutter(event_listener_t *self, const event_t *e)
 {
     const key_event_t *ke = e;
     dictionary_t *dict = dictionary_get_instance();
-    demo_t *demo = demo_get_instance();
+    // @todo @thread_safety      
 
+    int mode = -1;
     if (ke->hierarchy[1].verb == dict->get_atom(dict, "down")) {
-        demo->send_immediate(demo, "integer:1 set-mode * route stutter route");
-        rub->send_immediate(rub, "integer:1 set-mode");
-        blur->send_immediate(blur, "integer:1 set-mode");
+      mode = 1;
     } else if (ke->hierarchy[1].verb == dict->get_atom(dict, "up")) {
-        demo->send_immediate(demo, "integer:0 set-mode * route stutter route");
-        rub->send_immediate(rub, "integer:0 set-mode");
-        blur->send_immediate(blur, "integer:0 set-mode");
+      mode = 0;
+    }
+    if (mode >= 0) {
+        ((effect_t*)stutter)->set_mode((effect_t*)stutter, mode);
+	((effect_t*)rub)->set_mode((effect_t*)rub, mode);
+	((effect_t*)blur)->set_mode((effect_t*)blur, mode);
     }
 }
 
@@ -260,7 +270,7 @@ static void stutter_control_setY(stutter_control_t *self, double adjustment)
             high_base = high_limit;
             self->high_gauge->set_percent(self->high_gauge,
                                           high_base / high_limit);
-            TRACE3("high_base: %f (%f)", high_base, high_base / high_limit);
+            TRACE("high_base: %f (%f)", high_base, high_base / high_limit);
         }
         if (low_base > high_base)
             low_base = high_base;
@@ -268,7 +278,7 @@ static void stutter_control_setY(stutter_control_t *self, double adjustment)
             low_base = 0.0;
 
         self->low_gauge->set_percent(self->low_gauge, low_base / high_base);
-        TRACE3("low_base: %f (%f)", low_base, low_base / high_base);
+        TRACE("low_base: %f (%f)", low_base, low_base / high_base);
         break;
     case SC_HIGH_BASE:
         high_base += delta;
@@ -278,7 +288,7 @@ static void stutter_control_setY(stutter_control_t *self, double adjustment)
             high_base = high_limit;
         self->high_gauge->set_percent(self->high_gauge, high_base / high_limit);
         self->low_gauge->set_percent(self->low_gauge, low_base / high_base);
-        TRACE3("high_base: %f (%f)", high_base, high_base / high_limit);
+        TRACE("high_base: %f (%f)", high_base, high_base / high_limit);
         break;
     case SC_FB:
         fb += delta;
@@ -287,7 +297,7 @@ static void stutter_control_setY(stutter_control_t *self, double adjustment)
         else if (fb > 1.0f)
             fb = 1.0f;
         self->fb_gauge->set_percent(self->fb_gauge, fb);
-        TRACE2("fb: %f", fb);
+        TRACE("fb: %f", fb);
         break;
     default:
         // nothing
@@ -309,14 +319,14 @@ static void stutter_control_setX(stutter_control_t *self, double adjustment)
             repeat_proba = 0.0;
         self->repeat_gauge->set_percent(self->repeat_gauge, repeat_proba);
         repeat_proba_just_changed_p = 1;
-        TRACE2("repeat proba: %f%%", 100.0 * repeat_proba);
+        TRACE("repeat proba: %f%%", 100.0 * repeat_proba);
         break;
     case SC_SPEED:
         if (speed_base >= 0.0)
             speed_base += delta;
         else
             speed_base -= delta;
-        TRACE2("speed: %f%%", speed_base);
+        TRACE("speed: %f%%", speed_base);
         break;
     default:
         // nothing
@@ -485,13 +495,13 @@ static void receiver_setup()
     receiver = receiver_instantiate_toplevel(NULL);
     receiver->set_definition(receiver, rub_atom,
                              compile_cstring("integer", NULL),
-                             (recp_f)rub_callback);
+                             rub_callback);
     receiver->close(receiver, rub_atom);
     receiver->set_definition(receiver, ice_atom, compile_cstring("", NULL),
-                             (recp_f)ice_callback);
+                             ice_callback);
     receiver->set_definition(receiver, alpha_atom,
                              compile_cstring("integer", NULL),
-                             (recp_f)ice_alpha_callback);
+                             ice_alpha_callback);
 }
 
 static void modplug_callback(void *self, double ms, unsigned int chn,
@@ -499,6 +509,8 @@ static void modplug_callback(void *self, double ms, unsigned int chn,
                              unsigned char volcmd, unsigned char volume,
                              unsigned char row_command, unsigned char row_param)
 {
+    // @todo @thread_safety      
+  
     const double diffms =
         ms + stutter->super.super.get_latency_ms(&stutter->super.super);
     if (instr == 1 || instr == 2 || instr == 3 || instr == 4) {
@@ -685,7 +697,7 @@ int bidule_new(effect_t *self)
 
     /* choose text version */
     {
-        TRACE2("locale: '%s'", locale);
+        TRACE("locale: '%s'", locale);
         if (strstr(locale, "fr"))
             seer_string->new (seer_string, seer_cstring_fr);
         else if (strstr(locale, "fi"))
@@ -1238,7 +1250,7 @@ audio_effect_t *truc_instantiate()
 
     if (!modplug->super.load_file(&modplug->super, url_open(module_url, "rb"),
                                   NULL)) {
-        ERROR2("modplug could not load %s", module_url);
+        ERROR("modplug could not load %s", module_url);
     }
     {
         context_t c;

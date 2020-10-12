@@ -12,7 +12,7 @@
 
 #include "bytecode_stream.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_SCRIPTING_BYTECODE_STREAM);
 
 #include "dictionary.h"
@@ -107,13 +107,6 @@ static int bytecode_stream_release(object_t *zelf)
     return ret_p;
 }
 
-static int bytecode_stream_destroy(struct bytecode_stream_t *self)
-{
-    ERROR3("DEPRECATED, don't call this method anymore. caller is: %x - %x",
-           __builtin_return_address(0), __builtin_return_address(1));
-    return bytecode_stream_release(bytecode_stream_to_object(self));
-}
-
 static bytecode_stream_t *bytecode_stream_copy(bytecode_stream_t *self,
                                                bytecode_stream_t *src)
 {
@@ -158,7 +151,7 @@ static bytecode_stream_t *bytecode_stream_append_node(bytecode_stream_t *self,
     bytecode_node_t *end = self->end;
 
     if (node == NULL) {
-        WARNING1("tried to append null node.");
+        WARNING("tried to append null node.");
         return self;
     }
 
@@ -183,7 +176,7 @@ static bytecode_stream_t *bytecode_stream_prepend_node(bytecode_stream_t *self,
     bytecode_node_t *end = self->end;
 
     if (node == NULL) {
-        WARNING1("tried to append null node.");
+        WARNING("tried to append null node.");
         return self;
     }
 
@@ -343,7 +336,6 @@ bytecode_stream_t *bytecode_stream_instantiate(bytecode_stream_t *x)
                                 bytecode_stream_release);
 
     s->new = bytecode_stream_new;
-    s->destroy = bytecode_stream_destroy;
     s->copy = bytecode_stream_copy;
 
     s->get_count = bytecode_stream_get_count;

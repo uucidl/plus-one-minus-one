@@ -12,7 +12,7 @@
 
 #include "modplug_player.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_MODPLUG_MODPLUG_PLAYER);
 
 #include <system/pan.h>
@@ -59,7 +59,7 @@ static void modplug_player_set_area_parameters(audio_effect_t *self, int srate,
         player->settings.mFrequency = srate;
         break;
     default:
-        ERROR1("srate unsupported by modplug.");
+        ERROR("srate unsupported by modplug.");
     }
 
     player->settings.mChannels = 2;
@@ -122,7 +122,7 @@ static void modplug_player_computes_area(audio_effect_t *self,
 static void modplug_player_eom(void *zelf, double ms)
 {
     resource_audio_effect_t *self = zelf;
-    TRACE2("sending eos (%f)", ms);
+    TRACE("sending eos (%f)", ms);
     resource_audio_effect_send_eos_message(self, ms);
 }
 

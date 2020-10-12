@@ -15,7 +15,7 @@
 #include <libc/stdlib.h>
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 // LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_VIDEO_EFFECT);
 
 argb32_video_frame_signature_t *

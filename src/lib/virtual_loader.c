@@ -20,7 +20,7 @@
 
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_LIB_VIRTUAL_LOADER);
 
 typedef struct virtual_path_node_t {
@@ -146,10 +146,10 @@ static stream_t *indirect_open(url_t *local_url, const char *path,
     }
 
     if (tu.server && strlen(tu.server))
-        TRACE6("url got: '%s://%s:%d%s' for path '%s'", tu.protocol, tu.server,
+        TRACE("url got: '%s://%s:%d%s' for path '%s'", tu.protocol, tu.server,
                tu.port, tu.path, path);
     else
-        TRACE4("url got: '%s://%s' for path '%s'", tu.protocol, tu.path, path);
+        TRACE("url got: '%s://%s' for path '%s'", tu.protocol, tu.path, path);
 
     ztrmmm = url_open2(&tu, mode);
     tu.destroy(&tu);
@@ -164,13 +164,13 @@ static stream_t *virtual_url_open(const char *url, const char *mode)
     char *vhost = strdup(url);
     char *vpath = strchr(vhost, '/');
     if (vpath == NULL) {
-        ERROR2("no path specified for virtual host '%s'", vhost);
+        ERROR("no path specified for virtual host '%s'", vhost);
     } else {
         *vpath++ = '\0';
     }
 
     if (!strlen(vhost)) {
-        ERROR1("virtual host not specified.");
+        ERROR("virtual host not specified.");
     } else {
         virtual_loader_t *v = virtual_loader_get_instance();
         local_path_iterator_t *it = v->get_local_search_path(v, vhost);
@@ -189,7 +189,7 @@ static stream_t *virtual_url_open(const char *url, const char *mode)
                 lu->destroy(lu);
                 object_retire(url_to_object(lu));
             } else {
-                WARNING3("didn't find local url '%s' for host: '%s'", vpath,
+                WARNING("didn't find local url '%s' for host: '%s'", vpath,
                          vhost);
             }
         }
@@ -275,7 +275,7 @@ static void virtual_loader_add_search_path(virtual_loader_t *self,
             v->content.path = map_instantiate_toplevel(NULL);
         }
         /* clone url */
-        TRACE5("vhost: %s now points to: %s %s %s", vhost, url->protocol,
+        TRACE("vhost: %s now points to: %s %s %s", vhost, url->protocol,
                url->server, url->path);
         map_push(v->content.path, url->copy(NULL, url));
     }

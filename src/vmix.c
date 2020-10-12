@@ -21,7 +21,7 @@
 #include <lib/pixel.h>
 #include <scripting/compile.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_VMIX);
 
 static atom_t crossfade_atom = 0;
@@ -62,7 +62,7 @@ static void vmix_set_mix_type_cb(vmix_t *self, atom_t type)
     else if (type == mutilate_atom)
         t = MUTILATE;
     else {
-        ERROR2("Unsupported mix type: '%s'", atom_get_cstring_value(type));
+        ERROR("Unsupported mix type: '%s'", atom_get_cstring_value(type));
         return;
     }
 
@@ -291,20 +291,6 @@ vmix_t *vmix_instantiate(vmix_t *x)
     vm->super.set_frame_size = vmix_set_frame_size;
     vm->set_mix = vmix_set_mix;
     vm->set_mix_type = vmix_set_mix_type;
-
-    {
-        receiver_t *r =
-            router_get_receiver(effect_get_router(&vm->super.super));
-        dictionary_t *d = dictionary_get_instance();
-
-        r->set_definition(r, d->new_atom(d, "set-mix"),
-                          compile_cstring("integer", NULL),
-                          (recp_f)vm->set_mix);
-        r->set_definition(r, d->new_atom(d, "set-mix-type"),
-                          compile_cstring("atom", NULL),
-                          (recp_f)vmix_set_mix_type_cb);
-    }
-
     vm->set_left_effect = vmix_set_left_effect;
     vm->set_right_effect = vmix_set_right_effect;
     vm->set_left_offset_ms = vmix_set_left_offset_ms;

@@ -12,7 +12,7 @@
 
 #include <library/memory.h>
 
-#include <log4c.h>
+#include <logging.h>
 
 /*
   Returns the current allocator in context.
@@ -29,7 +29,7 @@ static inline void *memory_allocate(size_t size)
     void *ptr = a->allocate(a, size);
 
     if (ptr == NULL) {
-        WARNING1("Not enough memory left!");
+        WARNING("Not enough memory left!");
     }
 
     return ptr;

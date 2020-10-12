@@ -11,7 +11,7 @@
 
 #include "pan_driver.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_SUBCATEGORY(PAN_DRIVER, KNOS_DEMOS_SYSTEM);
 
 #include <library/map.h>
@@ -35,7 +35,7 @@ void put_pan_driver(const char *name, pan_driver_t *driver)
     atom_t a = dict->new_atom(dict, name);
 
     if (map_value_is_there(m->get(m, (unsigned long)a))) {
-        WARNING2("Redefining pan driver '%s'\n", name);
+        WARNING("Redefining pan driver '%s'\n", name);
     }
 
     m->put(m, (unsigned long)a, driver);
@@ -53,7 +53,7 @@ static int pan_driver_configure_demo(pan_driver_t *p, demo_t *demo)
             demo->pan_effect_root->get_frame_type(demo->pan_effect_root);
 
         if (frame_type != dict->get_atom(dict, AUDIO_EFFECT_FRAME_TYPE_NAME)) {
-            ERROR3("Invalid frame type for audio effect. (%s) Expected %s.",
+            ERROR("Invalid frame type for audio effect. (%s) Expected %s.",
                    atom_get_cstring_value(frame_type),
                    AUDIO_EFFECT_FRAME_TYPE_NAME);
             return 0;
@@ -61,7 +61,7 @@ static int pan_driver_configure_demo(pan_driver_t *p, demo_t *demo)
     }
 
     if (!demo->pan_effect_root->new (demo->pan_effect_root)) {
-        ERROR1("couldn't create audio effect.");
+        ERROR("couldn't create audio effect.");
         return 0;
     }
 

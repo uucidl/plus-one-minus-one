@@ -13,7 +13,7 @@
 
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_STRINGS);
 
 /*
@@ -188,7 +188,7 @@ static const char *iterator_next_character(string_iterator_t *self)
             self->node = self->node->next;
             self->index = 0;
             if (!self->node->n)
-                DEBUG1("node length was zero.");
+                DEBUG("node length was zero.");
         }
     }
 
@@ -210,7 +210,7 @@ static const char *iterator_previous_character(string_iterator_t *self)
         } else {
             self->node = self->node->prev;
             if (!self->node->n)
-                DEBUG1("node length was zero.");
+                DEBUG("node length was zero.");
             else
                 self->index = self->node->n - 1;
         }
@@ -277,7 +277,7 @@ static void iterator_delete(string_iterator_t *self, unsigned int n)
             }
         }
     } else {
-        WARNING1("tried to delete 0 char.");
+        WARNING("tried to delete 0 char.");
     }
 }
 
@@ -296,7 +296,7 @@ static string_t *iterator_split(string_iterator_t *self, string_t *x)
         first_node_after_point = self->node;
 
         if (prev == NULL)
-            WARNING1("couldn't find previous node. data structure broken?");
+            WARNING("couldn't find previous node. data structure broken?");
         else {
             new_end_node = prev;
             if (new_end_node == self->node) {
@@ -329,7 +329,7 @@ static string_t *iterator_split(string_iterator_t *self, string_t *x)
             if (next == new_end_node)
                 next = NULL;
 
-            TRACE3("appending: %s, [%d]", node->data + node->head, node->n);
+            TRACE("appending: %s, [%d]", node->data + node->head, node->n);
             string_node_append(remaining, node);
             node = next;
         }
@@ -381,7 +381,7 @@ static void iterator_insert(string_iterator_t *self, const char *str)
             if (self->index == self->node->n) {
                 /* actually it's really the end of the node, so just an append
                    is needed */
-                DEBUG1("self->index == self->node->n");
+                DEBUG("self->index == self->node->n");
             } else {
                 string_node_t *second_part = calloc(sizeof(string_node_t), 1);
                 *second_part = *self->node;
@@ -395,7 +395,7 @@ static void iterator_insert(string_iterator_t *self, const char *str)
             }
         }
     } else {
-        WARNING1("tried to insert null or empty string.");
+        WARNING("tried to insert null or empty string.");
     }
 }
 
@@ -410,7 +410,7 @@ string_t *iterator_clone_to_after_point(string_iterator_t *self, string_t *dest)
 
         do {
             if (!node) {
-                ERROR1("Should not happen!");
+                ERROR("Should not happen!");
                 return NULL;
             }
 

@@ -14,7 +14,6 @@
 
 #include "effects.h"
 
-#include <messaging/router.h>
 #include <system/event_listener.h>
 
 /*
@@ -74,13 +73,6 @@ typedef struct demo_t {
     /* global event listener */
     event_listener_t event_listener;
     filtered_listener_t event_filter;
-
-    /* global router to which classes can attaches themselves */
-    router_t router;
-    /* compile and send a message to self */
-    void (*send_immediate)(struct demo_t *self, const char *message);
-    void (*send_message)(struct demo_t *self, bytecode_stream_t *msg,
-                         context_t *context);
 
     /* a callback called by pan if an overflow occurs */
     void (*pan_overflow_callback)(sample_t sample);

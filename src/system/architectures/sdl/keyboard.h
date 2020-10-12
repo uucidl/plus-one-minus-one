@@ -21,7 +21,6 @@
 */
 void sdl_keyboard_initialize();
 
-atom_t sdl_keysym_to_symbol(SDL_keysym keysym);
-int sdl_keysym_to_ascii(SDL_keysym keysym);
+atom_t sdl_keysym_to_symbol(SDL_Keysym keysym);
 
 #endif

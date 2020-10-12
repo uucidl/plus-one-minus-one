@@ -11,7 +11,7 @@
 
 #include "image_load_jpeg.h"
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_1_1_IMAGE_LOAD_JPEG);
 
 #include <libc/stdlib.h>
@@ -225,7 +225,7 @@ static void image_load_jpeg_error_exit(j_common_ptr cinfo)
             free((void *)mgr->im);
     }
 
-    ERROR1("jpeg load error.");
+    ERROR("jpeg load error.");
 
     longjmp(mgr->env, 1);
 }
@@ -234,7 +234,7 @@ image_t *image_load_jpg(image_t *x, stream_t *stream)
 {
     image_t *im;
 
-    TRACE1("loading jpeg file");
+    TRACE("loading jpeg file");
 
     if (!stream) {
         im = NULL;
@@ -275,7 +275,7 @@ image_t *image_load_jpg(image_t *x, stream_t *stream)
         }
 
         if (!cinfo.output_width || !cinfo.output_height) {
-            WARNING1("null size image.");
+            WARNING("null size image.");
             return NULL;
         }
 

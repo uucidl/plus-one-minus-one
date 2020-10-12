@@ -15,7 +15,7 @@
 #include <libc/stdlib.h>
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_THREAD_HELPER);
 
 int kn_thread_create_with_attributes(pthread_t *new_thread,
@@ -30,7 +30,7 @@ int kn_thread_create_with_attributes(pthread_t *new_thread,
         pthread_attr_init(attributes);
 
         if (pthread_attr_setschedpolicy(attributes, SCHED_OTHER)) {
-            ERROR1("Cannot set SCHED_OTHER ? ");
+            ERROR("Cannot set SCHED_OTHER ? ");
         }
     } else {
         attributes = attr;
@@ -69,7 +69,7 @@ int kn_thread_create_minimum_priority_with_attributes(pthread_t *new_thread,
     }
 
     if (pthread_attr_setschedpolicy(attributes, SCHED_OTHER)) {
-        ERROR1("Cannot set SCHED_OTHER ? ");
+        ERROR("Cannot set SCHED_OTHER ? ");
     }
 
     sched_parameters = (struct sched_param *)malloc(sizeof(struct sched_param));
@@ -78,7 +78,7 @@ int kn_thread_create_minimum_priority_with_attributes(pthread_t *new_thread,
     sched_parameters->sched_priority = sched_get_priority_min(SCHED_OTHER);
 
     if (pthread_attr_setschedparam(attributes, sched_parameters)) {
-        ERROR2("Cannot set scheduling priority of %d",
+        ERROR("Cannot set scheduling priority of %d",
                sched_parameters->sched_priority);
     }
 
@@ -131,7 +131,7 @@ void thread_yield()
 {
 #ifdef LINUX
     if (sched_yield() < 0) {
-        ERROR2("sched_yield: %s", strerror(errno));
+        ERROR("sched_yield: %s", strerror(errno));
     }
 #elif defined(MACOSX)
     pthread_yield_np();

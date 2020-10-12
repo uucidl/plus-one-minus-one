@@ -11,7 +11,7 @@
 
 #include <messaging/router.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_SUBCATEGORY(ROUTER, KNOS_MESSAGING_RECEIVER);
 
 #include <scripting/dictionary.h>
@@ -40,13 +40,13 @@ static void router_set_child(router_t *self, atom_t name, receiver_t *child)
 
     if (child == &self->super) {
         /* detect stupid errors, but not complicated loops */
-        WARNING1("what the fuck are you trying to do.");
+        WARNING("what the fuck are you trying to do.");
     }
 
     if (!slot) {
         slot = calloc(sizeof(router_slot_t), 1);
         map_put(&self->children, (unsigned long)name, slot);
-        TRACE2("added slot for selector: '%s'", atom_get_cstring_value(name));
+        TRACE("added slot for selector: '%s'", atom_get_cstring_value(name));
     }
 
     slot->name = name;
@@ -74,12 +74,12 @@ static void router_receive(receiver_t *self, bytecode_stream_t *message,
         bytecode_t *destination = message->pop(message);
 
         if (!destination) {
-            WARNING1("no destination provided.");
+            WARNING("no destination provided.");
             return;
         } else {
             atom_t dest = destination->verb;
             if (!router_route(get_slot(router, dest), message, context)) {
-                WARNING2("route '%s' not defined.",
+                WARNING("route '%s' not defined.",
                          atom_get_cstring_value(dest));
             }
         }
@@ -100,12 +100,12 @@ static void wildcard_router_receive(receiver_t *self,
         bytecode_t *destination = message->pop(message);
 
         if (!destination) {
-            WARNING1("no destination provided.");
+            WARNING("no destination provided.");
             return;
         } else {
             atom_t dest = destination->verb;
 
-            TRACE2("routing towards selector '%s' requested.",
+            TRACE("routing towards selector '%s' requested.",
                    atom_get_cstring_value(dest));
             if (dest == star_atom) {
                 map_iterator_t i;
@@ -120,10 +120,10 @@ static void wildcard_router_receive(receiver_t *self,
                         bytecode_stream_instantiate_toplevel(NULL);
                     message_copy->copy(message_copy, message);
 
-                    TRACE2("sending event to slot: '%s'",
+                    TRACE("sending event to slot: '%s'",
                            atom_get_cstring_value(slot->name));
                     if (!router_route(slot, message_copy, context)) {
-                        WARNING2("route '%s' not defined.",
+                        WARNING("route '%s' not defined.",
                                  atom_get_cstring_value(slot->name));
                     }
                 }
@@ -133,7 +133,7 @@ static void wildcard_router_receive(receiver_t *self,
                 bytecode_stream_retire(message);
             } else {
                 if (!router_route(get_slot(router, dest), message, context)) {
-                    WARNING2("route '%s' not defined.",
+                    WARNING("route '%s' not defined.",
                              atom_get_cstring_value(dest));
                 }
             }

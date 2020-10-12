@@ -10,7 +10,7 @@
  * full acceptance and understanding.
  * e 1 */
 
-#include <log4c.h>
+#include <logging.h>
 
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_LIB_RESOURCE_LOADERS);
 
@@ -51,7 +51,7 @@ static void res_set_fopen(struct rloader_t *self, const char *protocol,
     unsigned int i =
         find_slot(self->protocols, self->f_next, self->f_max, protocol);
     if (i >= self->f_max)
-        WARNING1(__FILE__ ": reached static limit in set_fopen.");
+        WARNING(__FILE__ ": reached static limit in set_fopen.");
     else {
         if (i == self->f_next)
             self->f_next++;

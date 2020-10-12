@@ -11,7 +11,7 @@
 
 #include <library/stream.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_STREAM);
 
 #include <libc/stdio.h>
@@ -20,7 +20,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_STREAM);
 
 static char *stream_get_as_memory_area(stream_t *self, int64_t *returned_size)
 {
-    ERROR1("get_as_memory_area unsupported.");
+    ERROR("get_as_memory_area unsupported.");
 
     *returned_size = 0;
     return NULL;
@@ -29,19 +29,19 @@ static char *stream_get_as_memory_area(stream_t *self, int64_t *returned_size)
 static void stream_free_memory_area(stream_t *self, char *buffer,
                                     int64_t returned_size)
 {
-    ERROR1("free_memory_area unsupported.");
+    ERROR("free_memory_area unsupported.");
 }
 
 static int stream_get_length(stream_t *self)
 {
-    ERROR1("get_length not supported.");
+    ERROR("get_length not supported.");
 
     return -1;
 }
 
 static stream_t *stream_fork(stream_t *self)
 {
-    ERROR1("fork not supported.");
+    ERROR("fork not supported.");
 
     return NULL;
 }

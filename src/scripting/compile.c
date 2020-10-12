@@ -19,7 +19,7 @@
 #include <libc/string.h>
 #include <libc/stdio.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_SCRIPTING_COMPILE);
 
 #include <library/memory_impl.h>
@@ -61,7 +61,7 @@ static bytecode_t *parse_definition(const string_t *string, bytecode_t *code)
             if (verb->get_iterator(verb, &it2)) {
                 it2.delete(&it2, 1);
             }
-            TRACE3("subs: '%s' '%s'", adverb->new_c_str(adverb),
+            TRACE("subs: '%s' '%s'", adverb->new_c_str(adverb),
                    verb->new_c_str(verb));
         } else {
             verb = &temp;
@@ -90,19 +90,19 @@ static bytecode_t *parse_definition(const string_t *string, bytecode_t *code)
                     if (0 == b->verb) {
                         b->verb = dict->new_atom(dict, strdup(s));
                     }
-                    TRACE2("atom: '%s'", atom_get_cstring_value(b->verb));
+                    TRACE("atom: '%s'", atom_get_cstring_value(b->verb));
                 } else if (b->adverb == integer_atom) {
                     int i = 0;
                     i = atoi(s);
-                    TRACE3("integer: '%d' (%s)", i, s);
+                    TRACE("integer: '%d' (%s)", i, s);
                     b->verb = atom_new_integer(i);
                 } else if (b->adverb == float_atom) {
                     float f;
                     f = atof(s);
-                    TRACE3("float: '%f' (%s)", f, s);
+                    TRACE("float: '%f' (%s)", f, s);
                     b->verb = atom_new_float(f);
                 } else {
-                    DEBUG2("undefined adverb for '%s'", s);
+                    DEBUG("undefined adverb for '%s'", s);
                 }
                 ret = code;
             }
@@ -216,7 +216,7 @@ bytecode_stream_t *compile_osc_string(const string_t *osc_string,
                     if (0 == atom) {
                         atom = dict->new_atom(dict, strdup(cs));
                     }
-                    TRACE2("prepending atom '%s'",
+                    TRACE("prepending atom '%s'",
                            atom_get_cstring_value(atom));
                     stream->prepend_atom(stream, route_atom);
                     stream->prepend_atom(stream, atom);

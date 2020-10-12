@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_VIDEO_ADAPTER);
 
 static int video_adapter_destroy(effect_t *zelf)
@@ -52,7 +52,7 @@ static int video_adapter_plug_effect(video_adapter_t *self, effect_t *e,
     atom_t frame_type = e->get_frame_type(e);
 
     if (video_frame_atom == frame_type) {
-        INFO1("all is fine and dandy.");
+        INFO("all is fine and dandy.");
         self->fc =
             &opengl_to_video_frame_converter_instantiate_toplevel(NULL)->super;
         self->fc->new (self->fc);
@@ -93,7 +93,7 @@ static int video_adapter_plug_effect(video_adapter_t *self, effect_t *e,
 
         status = 1;
     } else {
-        ERROR2("Unknown frame type: '%s'\n",
+        ERROR("Unknown frame type: '%s'\n",
                atom_get_cstring_value(frame_type));
         status = 0;
     }

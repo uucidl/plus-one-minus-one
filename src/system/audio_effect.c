@@ -15,7 +15,7 @@
 #include <libc/stdlib.h>
 #include <libc/string.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_AUDIO_EFFECT);
 
 audio_area_audio_frame_signature_t *
@@ -112,7 +112,7 @@ static void audio_effect_computes_in_parts(effect_t *self, void *content,
         count -= area_out.frame_number;
         now += area_out.frame_number * 1000.0 / x->sample_rate;
         if (count > 0)
-            TRACE2("cut at: %f", now);
+            TRACE("cut at: %f", now);
 
         context_retire(&c);
     }

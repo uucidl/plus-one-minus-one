@@ -17,7 +17,7 @@
 #include <scripting/dictionary.h>
 #include <scripting/compile.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_EFFECT);
 
 static int core_effect_new(effect_t *this)
@@ -40,7 +40,7 @@ static void core_effect_set_mode(effect_t *this, emode_t mode)
         if (this->mode != ON && this->swapped_computes)
             this->computes = this->swapped_computes;
         this->mode = ON;
-        TRACE2("'%s' setting mode: ON",
+        TRACE("'%s' setting mode: ON",
                atom_get_cstring_value(this->class->class));
         break;
     case OFF:
@@ -49,7 +49,7 @@ static void core_effect_set_mode(effect_t *this, emode_t mode)
         }
         this->computes = core_effect_computes;
         this->mode = OFF;
-        TRACE2("'%s' setting mode: OFF",
+        TRACE("'%s' setting mode: OFF",
                atom_get_cstring_value(this->class->class));
         break;
     }
@@ -104,18 +104,8 @@ effect_t *effect_instantiate(effect_t *x)
     e->get_latency_ms = core_effect_get_latency_ms;
     e->get_frame_type = core_effect_get_frame_type;
     e->set_frame_signature = core_effect_set_frame_signature;
-
-    {
-        receiver_t *r = router_get_receiver(effect_get_router(e));
-        e->set_mode = core_effect_set_mode;
-        r->set_definition(r, d->new_atom(d, "set-mode"),
-                          compile_cstring("integer", NULL),
-                          (recp_f)e->set_mode);
-
-        e->id = e->class->attach_instance(e->class, r);
-    }
-
     e->mode = ON;
+    e->set_mode = core_effect_set_mode;
     e->send_immediate = core_effect_send;
     e->send_message = core_effect_send_msg;
 
@@ -125,7 +115,4 @@ effect_t *effect_instantiate(effect_t *x)
 void effect_register_instance(const char *class_name, effect_t *instance)
 {
     instance->class = init_class(class_name);
-    instance->id = effect_get_class(instance)->attach_instance(
-        effect_get_class(instance),
-        router_get_receiver(effect_get_router(instance)));
 }

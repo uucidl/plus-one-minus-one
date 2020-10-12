@@ -11,7 +11,7 @@
 
 #include "progress.h"
 
-#include <log4c.h>
+#include "logging.h"
 LOG_NEW_DEFAULT_CATEGORY(KNOS_AUDIO_PROGRESS);
 
 #ifdef NDEBUG
@@ -25,7 +25,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_AUDIO_PROGRESS);
     do {                                                                       \
         progress_t *_self = (self);                                            \
         if (MAYBE_IS_NOTHING(&_self->current_n)) {                             \
-            ERROR1("current_n was advanced even though it was nothing!");      \
+            ERROR("current_n was advanced even though it was nothing!");      \
         }                                                                      \
     } while (0);
 
@@ -33,9 +33,9 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_AUDIO_PROGRESS);
     do {                                                                       \
         progress_t *_self = (self);                                            \
         if (_self->get_state(_self) == FINISHED) {                             \
-            ERROR1("cannot change state of a FINISHED progress!");             \
+            ERROR("cannot change state of a FINISHED progress!");             \
         } else if (_self->get_state(_self) == ABORTED) {                       \
-            ERROR1("cannot change state of an ABORTED progress!");             \
+            ERROR("cannot change state of an ABORTED progress!");             \
         }                                                                      \
     } while (0);
 
@@ -43,7 +43,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_AUDIO_PROGRESS);
 
 static state_t progress_get_state(progress_t *self)
 {
-    return atomic_intptr_get(&self->status);
+    return atomic_load(&self->status);
 }
 
 static maybe_size_t progress_get_max_n(progress_t *self)
@@ -59,7 +59,7 @@ static maybe_size_t progress_get_max_n(progress_t *self)
         /*
            atomic
         */
-        intptr_t value = atomic_intptr_get(MAYBE_REF_LVALUE(&self->max_n));
+        intptr_t value = atomic_load(MAYBE_REF_LVALUE(&self->max_n));
         MAYBE_SET_VALUE(&result, value);
     }
 
@@ -79,7 +79,7 @@ static maybe_size_t progress_get_current_n(progress_t *self)
         /*
            atomic
         */
-        intptr_t value = atomic_intptr_get(MAYBE_REF_LVALUE(&self->current_n));
+        intptr_t value = atomic_load(MAYBE_REF_LVALUE(&self->current_n));
         MAYBE_SET_VALUE(&result, value);
     }
 
@@ -90,9 +90,9 @@ static void progress_set_state(progress_t *self, state_t st)
 {
     PRECONDITIONS_ASSERT_STATE_ISNT_FINISHED(self);
 
-    TRACE2("setting state: %d\n", st);
+    TRACE("setting state: %d\n", st);
 
-    atomic_intptr_set(&self->status, st);
+    atomic_store(&self->status, st);
 }
 
 static void progress_set_max_n(progress_t *self, maybe_size_t n)
@@ -102,7 +102,7 @@ static void progress_set_max_n(progress_t *self, maybe_size_t n)
     PRECONDITIONS_ASSERT_STATE_ISNT_FINISHED(self);
 
     if (!MAYBE_SET_IS_NOTHING(&self->max_n, nothing_p)) {
-        atomic_intptr_set(MAYBE_REF_LVALUE(&self->max_n), MAYBE_GET_VALUE(&n));
+        atomic_store(MAYBE_REF_LVALUE(&self->max_n), MAYBE_GET_VALUE(&n));
     }
 }
 
@@ -113,14 +113,14 @@ static void progress_set_current_n(progress_t *self, maybe_size_t n)
     PRECONDITIONS_ASSERT_STATE_ISNT_FINISHED(self);
 
     if (!MAYBE_SET_IS_NOTHING(&self->current_n, nothing_p)) {
-        atomic_intptr_set(MAYBE_REF_LVALUE(&self->current_n),
+        atomic_store(MAYBE_REF_LVALUE(&self->current_n),
                           MAYBE_GET_VALUE(&n));
     }
 }
 
 static void progress_advance_current_n(progress_t *self, size_t by)
 {
-    atomic_intptr_add(MAYBE_REF_LVALUE(&self->current_n), by);
+    atomic_fetch_add(MAYBE_REF_LVALUE(&self->current_n), by);
     PRECONDITIONS_ASSERT_CURRENT_ISNT_NOTHING(self);
 }
 

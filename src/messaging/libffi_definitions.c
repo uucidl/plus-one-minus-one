@@ -10,6 +10,8 @@
  * full acceptance and understanding.
  * e 711 */
 
+#ifndef USE_BUILTIN_APPLY
+
 #include <messaging/libffi_definitions.h>
 #include <library/map_impl.h>
 
@@ -123,3 +125,5 @@ libffi_definitions_t *libffi_definitions_instantiate(libffi_definitions_t *x)
 
     return d;
 }
+
+#endif

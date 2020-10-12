@@ -11,7 +11,7 @@
 
 #include "url.h"
 
-#include <log4c.h>
+#include <logging.h>
 
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_LIB_URL);
 
@@ -142,7 +142,7 @@ static int url_new2(url_t *self, url_t *base_url, const char *relative_path)
     } else {
         char *dir;
         if (!base_path) {
-            WARNING1("base path was NULL. construction failed.");
+            WARNING("base path was NULL. construction failed.");
             return 0;
         }
 
@@ -367,7 +367,7 @@ url_t *url_copy(url_t *zelf, url_t *src)
     char *query = NULL;
 
     if (!src) {
-        DEBUG1("src == NULL");
+        DEBUG("src == NULL");
         return NULL;
     }
 

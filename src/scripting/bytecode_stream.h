@@ -32,11 +32,6 @@ typedef struct bytecode_stream_t {
     struct bytecode_node_t *end;
 
     int (*new)(struct bytecode_stream_t *self);
-    /*
-      deprecated, it is done automatically when retiring the bytecode_stream
-      (use object_t::release)
-    */
-    int (*destroy)(struct bytecode_stream_t *self);
 
     struct bytecode_stream_t *(*copy)(struct bytecode_stream_t *self,
                                       struct bytecode_stream_t *src);

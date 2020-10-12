@@ -12,7 +12,7 @@
 
 #include <library/http_stream.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_HTTP_STREAM);
 
 #include <libc/string.h>
@@ -37,7 +37,7 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_HTTP_STREAM);
 
 */
 
-static inline void say() { TRACE1("had to retry"); }
+static inline void say() { TRACE("had to retry"); }
 
 static http_stream_t *http_stream_do(http_stream_t *self, http_method_t method)
 {
@@ -71,9 +71,9 @@ static http_stream_t *http_stream_do(http_stream_t *self, http_method_t method)
                                       &response.response_mutex);
                 state = h->get_state(h);
                 if (state != DONE)
-                    DEBUG2("state != DONE but == %d", state);
+                    DEBUG("state != DONE but == %d", state);
                 ms += get_milliseconds();
-                DEBUG2("stream fetched in %f", ms / 1000.0);
+                DEBUG("stream fetched in %f", ms / 1000.0);
 
                 t->release(t, c);
                 pthread_mutex_unlock(&response.response_mutex);
@@ -110,17 +110,17 @@ static http_stream_t *http_stream_do(http_stream_t *self, http_method_t method)
                     self->super.buffer_owned_p = 1;
                 } else if (method == GET) {
                     char *url_s = self->url.create_string(&self->url);
-                    ERROR4("size of returned body was zero for get method. "
+                    ERROR("size of returned body was zero for get method. "
                            "location: %s, status: %d, content_length: %d\n",
                            url_s, self->status, self->content_length);
                     free(url_s);
                 }
             } else {
-                DEBUG2("status code was %d\n", response.status_code);
+                DEBUG("status code was %d\n", response.status_code);
             }
         } else {
             char *url_s = self->url.create_string(&self->url);
-            ERROR5("an error occured while downloading the resource: '%s'\n"
+            ERROR("an error occured while downloading the resource: '%s'\n"
                    "c: %d / c->stream.error_p: %d / response.broken_p: %d",
                    url_s, !!c, c ? c->stream.error_p : -1,
                    c ? response.broken_p : -1);
@@ -134,7 +134,7 @@ static http_stream_t *http_stream_do(http_stream_t *self, http_method_t method)
 static http_stream_t *http_stream_open(http_stream_t *self)
 {
     char *s = NULL;
-    TRACE2("Opening url: %s", s = self->url.create_string(&self->url));
+    TRACE("Opening url: %s", s = self->url.create_string(&self->url));
     if (s) {
         free(s);
     }

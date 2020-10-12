@@ -15,7 +15,7 @@
 
 #include <library/map_impl.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_DEMOS_SYSTEM_KGO);
 
 static kgo_driver_t *driver = 0;
@@ -37,7 +37,7 @@ int kgo_open(const char *driver_name, char *title, int width, int height)
         driver = map_value_obtain(kk_d);
         ret = driver->new (driver, title, width, height);
     } else {
-        ERROR2("couldn't find driver %s", driver_name);
+        ERROR("couldn't find driver %s", driver_name);
     }
 
     return ret;

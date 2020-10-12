@@ -12,7 +12,7 @@
 
 #include <library/sock_stream.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_LIBRARY_SOCK_STREAM);
 
 #include <library/sock.h>
@@ -51,7 +51,7 @@ static int init_sockaddr(struct sockaddr_in *name, url_t *url)
     struct hostent *hostinfo;
 
     if (!url || !url->server) {
-        DEBUG1("url == NULL?");
+        DEBUG("url == NULL?");
         return -1;
     }
 
@@ -62,7 +62,7 @@ static int init_sockaddr(struct sockaddr_in *name, url_t *url)
 
     hostinfo = gethostbyname(url->server);
     if (hostinfo == NULL) {
-        ERROR2("Unknown host %s.", url->server);
+        ERROR("Unknown host %s.", url->server);
         return -1;
     }
     name->sin_addr = *(struct in_addr *)hostinfo->h_addr;

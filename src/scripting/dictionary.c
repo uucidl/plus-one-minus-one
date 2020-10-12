@@ -19,7 +19,7 @@
 #include <libc/stdio.h>
 #include <library/memory.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_SCRIPTING_DICTIONARY);
 
 static atom_container_t *atom_container_new(const char *name)
@@ -56,7 +56,7 @@ static atom_t dictionary_new_atom(dictionary_t *self, const char *name)
         ac = atom_container_new(name);
 
         cstr_map_put(&self->atoms, name, ac);
-        TRACE3("new atom: '%s' (<%x>)", name, (long int)ac);
+        TRACE("new atom: '%s' (<%x>)", name, (long int)ac);
     }
 
     return (atom_t)ac;
@@ -91,7 +91,7 @@ static atom_t dictionary_get_atom(dictionary_t *self, const char *name)
 {
     atom_t a = (atom_t)get_atom(self, name, NULL);
     if (a == 0)
-        TRACE2("unknown atom: '%s'", name);
+        TRACE("unknown atom: '%s'", name);
     return a;
 }
 

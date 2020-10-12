@@ -12,7 +12,7 @@
 
 #include <network/http_handler.h>
 
-#include <log4c.h>
+#include <logging.h>
 LOG_NEW_DEFAULT_CATEGORY(KNOS_NETWORK_HTTP_HANDLER);
 
 #include <libc/stdlib.h>
@@ -21,20 +21,20 @@ LOG_NEW_DEFAULT_CATEGORY(KNOS_NETWORK_HTTP_HANDLER);
 static void set_state(http_handler_t *self, http_state_t nu)
 {
     if (pthread_mutex_lock(&self->state_mutex))
-        ERROR1("state_mutex lock");
+        ERROR("state_mutex lock");
     self->state = nu;
     if (pthread_mutex_unlock(&self->state_mutex))
-        ERROR1("state_mutex unlock");
+        ERROR("state_mutex unlock");
 }
 
 static http_state_t get_state(http_handler_t *self)
 {
     http_state_t state;
     if (pthread_mutex_lock(&self->state_mutex))
-        ERROR1("state_mutex lock");
+        ERROR("state_mutex lock");
     state = self->state;
     if (pthread_mutex_unlock(&self->state_mutex))
-        ERROR1("state_mutex unlock");
+        ERROR("state_mutex unlock");
 
     return state;
 }
@@ -87,7 +87,7 @@ static void hh_prepare_head_request(http_handler_t *self, url_t *url)
     self->request_type = HEAD;
     set_state(self, REQUEST);
 
-    TRACE2("%s", self->request);
+    TRACE("%s", self->request);
     pthread_mutex_unlock(&self->callback_mutex);
 }
 
@@ -104,7 +104,7 @@ static void hh_prepare_get_request(http_handler_t *self, url_t *url)
     self->request_type = GET;
     set_state(self, REQUEST);
 
-    TRACE2("%s", self->request);
+    TRACE("%s", self->request);
     pthread_mutex_unlock(&self->callback_mutex);
 }
 
@@ -526,7 +526,7 @@ static void hh_on_read(transport_callbacks_t *zelf, channel_t *c, char *buffer,
         }
     }
     if (n > 0)
-        DEBUG2("remaining: %d", n);
+        DEBUG("remaining: %d", n);
     pthread_mutex_unlock(&self->callback_mutex);
 }
 
@@ -538,9 +538,9 @@ static void hh_on_close(transport_callbacks_t *zelf, channel_t *chan)
     if (get_state(self) != DONE) {
         if (!self->response->connection_close_p && chan->stream.broken_p) {
             self->response->broken_p = 1;
-            DEBUG2("connection broken. (state: %d)", get_state(self));
+            DEBUG("connection broken. (state: %d)", get_state(self));
             if (get_state(self) == BODY) {
-                DEBUG3("%d / %d", self->bdy_size,
+                DEBUG("%d / %d", self->bdy_size,
                        self->response->content_length);
             }
         } else if (!self->response->data && self->bdy_size > 0) {

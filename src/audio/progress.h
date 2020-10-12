@@ -15,8 +15,7 @@
 #include <library/memory.h>
 #include <library/maybe.h>
 #include <libc/unistd.h> // for size_t
-
-#include <library/atomic_intptr.h>
+#include <libc/stdatomic.h>
 
 typedef MAYBE(atomic_intptr_t) maybe_counter_t;
 typedef MAYBE(size_t) maybe_size_t;
